@@ -11,7 +11,7 @@ pub enum PieceType {
     King = 6,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 #[repr(u8)]
 pub enum Color {
     White = 0,
