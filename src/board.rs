@@ -1,25 +1,25 @@
-use crate::piece::Piece;
+use crate::piece::{Color, PieceType, TaggedPiece};
 
 #[allow(dead_code)]
-pub struct Board([Piece; 64]);
+pub struct Board([TaggedPiece; 64]);
 
 #[allow(dead_code)]
 impl Board {
     pub fn new() -> Self {
         let mut board = Board {
-            0: [Piece::None; 64],
+            0: [TaggedPiece::empty(); 64],
         };
 
         for i in 0..8 {
-            board.0[8 + i] = Piece::WhitePawn;
-            board.0[8 * 6 + i] = Piece::BlackPawn;
+            board.0[8 + i] = TaggedPiece::new(PieceType::Pawn, Color::White);
+            board.0[8 * 6 + i] = TaggedPiece::new(PieceType::Pawn, Color::Black);
         }
 
-        board.place_matching_at(0, Piece::WhiteRook);
-        board.place_matching_at(1, Piece::WhiteKnight);
-        board.place_matching_at(2, Piece::WhiteBishop);
-        board.place_at(3, Piece::WhiteQueen);
-        board.place_at(4, Piece::WhiteKing);
+        board.place_matching_at(0, PieceType::Rook);
+        board.place_matching_at(1, PieceType::Knight);
+        board.place_matching_at(2, PieceType::Bishop);
+        board.place_at(3, PieceType::Queen);
+        board.place_at(4, PieceType::King);
 
         return board;
     }
@@ -32,15 +32,14 @@ impl Board {
         }
     }
 
-    fn place_at(&mut self, offset: usize, piece: Piece) {
-        let opposite = piece.opposite();
-        self.0[offset] = piece;
-        self.0[8 * 7 + offset] = opposite;
+    fn place_at(&mut self, offset: usize, r#type: PieceType) {
+        self.0[offset] = TaggedPiece::new(r#type, Color::White);
+        self.0[8 * 7 + offset] = TaggedPiece::new(r#type, Color::White);
     }
 
-    fn place_matching_at(&mut self, offset: usize, piece: Piece) {
-        self.place_at(offset, piece);
-        self.place_at(7 - offset, piece);
+    fn place_matching_at(&mut self, offset: usize, r#type: PieceType) {
+        self.place_at(offset, r#type);
+        self.place_at(7 - offset, r#type);
     }
 }
 
@@ -48,13 +47,15 @@ impl Board {
 mod tests {
     use super::*;
 
-    fn exists_at(board: &Board, offset: usize, piece: Piece) {
-        let opposite = piece.opposite();
-        assert_eq!(board.0[offset], piece);
-        assert_eq!(board.0[8 * 7 + offset], opposite);
+    fn exists_at(board: &Board, offset: usize, r#type: PieceType) {
+        assert_eq!(board.0[offset], TaggedPiece::new(r#type, Color::White));
+        assert_eq!(
+            board.0[8 * 7 + offset],
+            TaggedPiece::new(r#type, Color::White)
+        );
     }
 
-    fn exists_matching_at(board: &Board, offset: usize, piece: Piece) {
+    fn exists_matching_at(board: &Board, offset: usize, piece: PieceType) {
         exists_at(board, offset, piece);
         exists_at(board, 7 - offset, piece);
     }
@@ -63,18 +64,24 @@ mod tests {
         let board = Board::new();
 
         for i in 0..8 {
-            assert_eq!(board.0[8 + i], Piece::WhitePawn);
-            assert_eq!(board.0[8 * 6 + i], Piece::BlackPawn);
+            assert_eq!(
+                board.0[8 + i],
+                TaggedPiece::new(PieceType::Pawn, Color::White)
+            );
+            assert_eq!(
+                board.0[8 * 6 + i],
+                TaggedPiece::new(PieceType::Pawn, Color::Black)
+            );
         }
 
         for i in 8 * 2..8 * 6 {
-            assert_eq!(board.0[i], Piece::None);
+            assert_eq!(board.0[i], TaggedPiece::empty());
         }
 
-        exists_matching_at(&board, 0, Piece::WhiteRook);
-        exists_matching_at(&board, 1, Piece::WhiteKnight);
-        exists_matching_at(&board, 2, Piece::WhiteBishop);
-        exists_at(&board, 3, Piece::WhiteQueen);
-        exists_at(&board, 4, Piece::WhiteKing);
+        exists_matching_at(&board, 0, PieceType::Rook);
+        exists_matching_at(&board, 1, PieceType::Knight);
+        exists_matching_at(&board, 2, PieceType::Bishop);
+        exists_at(&board, 3, PieceType::Queen);
+        exists_at(&board, 4, PieceType::King);
     }
 }

@@ -1,14 +1,30 @@
+use crate::piece::PieceType;
+
 #[derive(Copy, Clone)]
-pub struct Move(u8);
+pub struct Move {
+    pos: u8,
+    piece_type: PieceType,
+}
 
 impl Move {
-    pub fn new(x: u8, y: u8) -> Self {
+    pub fn new(x: u8, y: u8, piece_type: PieceType) -> Self {
         assert!(x < 8 && y < 8);
-        return Move { 0: x | (y << 4) };
+        return Move {
+            pos: x | (y << 4),
+            piece_type: piece_type,
+        };
+    }
+
+    pub fn from_tuple(t: (u8, u8, PieceType)) -> Self {
+        return Self::new(t.0, t.1, t.2);
     }
 
     pub fn to_xy(&self) -> (u8, u8) {
-        return (self.0 & 15, self.0 >> 4);
+        return (self.pos & 15, self.pos >> 4);
+    }
+
+    pub fn get_piece_type(&self) -> PieceType {
+        return self.piece_type;
     }
 }
 
@@ -19,12 +35,12 @@ impl Moves {
     pub fn empty() -> Self {
         return Moves {
             0: 0,
-            1: [Move::new(0, 0); MAX_SINGE_PIECE_MOVES],
+            1: [Move::new(0, 0, PieceType::None); MAX_SINGE_PIECE_MOVES],
         };
     }
 
-    pub fn add(&mut self, x: u8, y: u8) {
-        self.1[self.0 as usize] = Move::new(x, y);
+    pub fn add(&mut self, x: u8, y: u8, piece: PieceType) {
+        self.1[self.0 as usize] = Move::new(x, y, piece);
         self.0 += 1;
     }
 }
@@ -36,7 +52,7 @@ mod tests {
     fn from_coords_and_back() {
         for y in 0..8 {
             for x in 0..8 {
-                let m = Move::new(x, y);
+                let m = Move::new(x, y, PieceType::None);
                 let pos = m.to_xy();
                 assert_eq!(x, pos.0);
                 assert_eq!(y, pos.1);

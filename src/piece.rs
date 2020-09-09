@@ -1,33 +1,57 @@
 #[allow(dead_code)]
 #[derive(Copy, Clone, PartialEq, Debug)]
 #[repr(u8)]
-pub enum Piece {
+pub enum PieceType {
     None = 0,
-
-    WhitePawn = 1,
-    WhiteRook = 2,
-    WhiteKnight = 3,
-    WhiteBishop = 4,
-    WhiteQueen = 5,
-    WhiteKing = 6,
-
-    BlackPawn = 129,
-    BlackRook = 130,
-    BlackKnight = 131,
-    BlackBishop = 132,
-    BlackQueen = 133,
-    BlackKing = 134,
+    Pawn = 1,
+    Rook = 2,
+    Knight = 3,
+    Bishop = 4,
+    Queen = 5,
+    King = 6,
 }
 
-impl Piece {
-    pub fn opposite(&self) -> Self {
-        if *self == Piece::None {
-            return Piece::None;
-        }
+#[derive(Debug, PartialEq)]
+#[repr(u8)]
+pub enum Color {
+    White = 0,
+    Black = 128,
+}
 
+#[derive(Copy, Clone, PartialEq)]
+pub struct TaggedPiece(u8);
+
+impl TaggedPiece {
+    pub fn empty() -> Self {
+        return TaggedPiece { 0: 0 };
+    }
+
+    pub fn new(r#type: PieceType, color: Color) -> Self {
+        return TaggedPiece {
+            0: (r#type as u8) ^ (color as u8),
+        };
+    }
+
+    pub fn get_type(&self) -> PieceType {
         unsafe {
-            return std::mem::transmute(*self as u8 ^ 128);
+            return std::mem::transmute(self.0 & 127);
         }
+    }
+
+    pub fn get_color(&self) -> Color {
+        unsafe {
+            return std::mem::transmute(self.0 & 128);
+        }
+    }
+
+    pub fn opposite_color(&self) -> Self {
+        return TaggedPiece { 0: self.0 ^ 128 };
+    }
+}
+
+impl std::fmt::Debug for TaggedPiece {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        return write!(f, "[{:?}, {:?}]", self.get_color(), self.get_type());
     }
 }
 
@@ -36,27 +60,44 @@ mod tests {
     use super::*;
 
     #[test]
-    fn opposite_piece_black_to_white() {
-        assert_eq!(Piece::BlackPawn.opposite(), Piece::WhitePawn);
-        assert_eq!(Piece::BlackRook.opposite(), Piece::WhiteRook);
-        assert_eq!(Piece::BlackKnight.opposite(), Piece::WhiteKnight);
-        assert_eq!(Piece::BlackBishop.opposite(), Piece::WhiteBishop);
-        assert_eq!(Piece::BlackQueen.opposite(), Piece::WhiteQueen);
-        assert_eq!(Piece::BlackKing.opposite(), Piece::WhiteKing);
+    fn empty() {
+        let empty = TaggedPiece::empty();
+        assert_eq!(empty.0, 0);
     }
 
     #[test]
-    fn opposite_piece_white_to_black() {
-        assert_eq!(Piece::WhitePawn.opposite(), Piece::BlackPawn);
-        assert_eq!(Piece::WhiteRook.opposite(), Piece::BlackRook);
-        assert_eq!(Piece::WhiteKnight.opposite(), Piece::BlackKnight);
-        assert_eq!(Piece::WhiteBishop.opposite(), Piece::BlackBishop);
-        assert_eq!(Piece::WhiteQueen.opposite(), Piece::BlackQueen);
-        assert_eq!(Piece::WhiteKing.opposite(), Piece::BlackKing);
+    fn get_type() {
+        fn piece_type_persists(r#type: PieceType) {
+            assert_eq!(TaggedPiece::new(r#type, Color::White).get_type(), r#type);
+            assert_eq!(TaggedPiece::new(r#type, Color::Black).get_type(), r#type);
+        }
+
+        piece_type_persists(PieceType::Pawn);
+        piece_type_persists(PieceType::Rook);
+        piece_type_persists(PieceType::Knight);
+        piece_type_persists(PieceType::Bishop);
+        piece_type_persists(PieceType::Queen);
+        piece_type_persists(PieceType::King);
     }
 
     #[test]
-    fn opposite_piece_none() {
-        assert_eq!(Piece::None.opposite(), Piece::None);
+    fn get_color() {
+        fn color_persists(r#type: PieceType) {
+            assert_eq!(
+                TaggedPiece::new(r#type, Color::White).get_color(),
+                Color::White
+            );
+            assert_eq!(
+                TaggedPiece::new(r#type, Color::Black).get_color(),
+                Color::Black
+            );
+        }
+
+        color_persists(PieceType::Pawn);
+        color_persists(PieceType::Rook);
+        color_persists(PieceType::Knight);
+        color_persists(PieceType::Bishop);
+        color_persists(PieceType::Queen);
+        color_persists(PieceType::King);
     }
 }
