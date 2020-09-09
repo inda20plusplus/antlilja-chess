@@ -50,23 +50,6 @@ impl std::fmt::Debug for Move {
     }
 }
 
-const MAX_SINGE_PIECE_MOVES: usize = 21;
-pub struct Moves(u8, [Move; MAX_SINGE_PIECE_MOVES]);
-
-impl Moves {
-    pub fn empty() -> Self {
-        return Moves {
-            0: 0,
-            1: [Move::new(0, 0, MoveType::None); MAX_SINGE_PIECE_MOVES],
-        };
-    }
-
-    pub fn add(&mut self, x: u8, y: u8, r#type: MoveType) {
-        self.1[self.0 as usize] = Move::new(x, y, r#type);
-        self.0 += 1;
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
