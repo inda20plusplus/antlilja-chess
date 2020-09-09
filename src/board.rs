@@ -1,19 +1,19 @@
-use crate::piece::{Color, PieceType, TaggedPiece};
+use crate::piece::{Color, ColoredPiece, PieceType};
 use crate::r#move::{Move, MoveType};
 
 #[allow(dead_code)]
-pub struct Board([TaggedPiece; 64]);
+pub struct Board([ColoredPiece; 64]);
 
 #[allow(dead_code)]
 impl Board {
     pub fn new() -> Self {
         let mut board = Board {
-            0: [TaggedPiece::empty(); 64],
+            0: [ColoredPiece::empty(); 64],
         };
 
         for i in 0..8 {
-            board.0[8 + i] = TaggedPiece::new(PieceType::Pawn, Color::White);
-            board.0[8 * 6 + i] = TaggedPiece::new(PieceType::Pawn, Color::Black);
+            board.0[8 + i] = ColoredPiece::new(PieceType::Pawn, Color::White);
+            board.0[8 * 6 + i] = ColoredPiece::new(PieceType::Pawn, Color::Black);
         }
 
         board.place_matching_at(0, PieceType::Rook);
@@ -25,7 +25,7 @@ impl Board {
         return board;
     }
 
-    pub fn at(&self, x: u8, y: u8) -> TaggedPiece {
+    pub fn at(&self, x: u8, y: u8) -> ColoredPiece {
         return self.0[(y * 8 + x) as usize];
     }
 
@@ -97,8 +97,8 @@ impl Board {
     }
 
     fn place_at(&mut self, offset: usize, r#type: PieceType) {
-        self.0[offset] = TaggedPiece::new(r#type, Color::White);
-        self.0[8 * 7 + offset] = TaggedPiece::new(r#type, Color::White);
+        self.0[offset] = ColoredPiece::new(r#type, Color::White);
+        self.0[8 * 7 + offset] = ColoredPiece::new(r#type, Color::White);
     }
 
     fn place_matching_at(&mut self, offset: usize, r#type: PieceType) {
@@ -112,10 +112,10 @@ mod tests {
     use super::*;
 
     fn exists_at(board: &Board, offset: usize, r#type: PieceType) {
-        assert_eq!(board.0[offset], TaggedPiece::new(r#type, Color::White));
+        assert_eq!(board.0[offset], ColoredPiece::new(r#type, Color::White));
         assert_eq!(
             board.0[8 * 7 + offset],
-            TaggedPiece::new(r#type, Color::White)
+            ColoredPiece::new(r#type, Color::White)
         );
     }
 
@@ -130,16 +130,16 @@ mod tests {
         for i in 0..8 {
             assert_eq!(
                 board.0[8 + i],
-                TaggedPiece::new(PieceType::Pawn, Color::White)
+                ColoredPiece::new(PieceType::Pawn, Color::White)
             );
             assert_eq!(
                 board.0[8 * 6 + i],
-                TaggedPiece::new(PieceType::Pawn, Color::Black)
+                ColoredPiece::new(PieceType::Pawn, Color::Black)
             );
         }
 
         for i in 8 * 2..8 * 6 {
-            assert_eq!(board.0[i], TaggedPiece::empty());
+            assert_eq!(board.0[i], ColoredPiece::empty());
         }
 
         exists_matching_at(&board, 0, PieceType::Rook);

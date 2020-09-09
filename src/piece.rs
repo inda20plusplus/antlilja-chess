@@ -19,15 +19,15 @@ pub enum Color {
 }
 
 #[derive(Copy, Clone, PartialEq)]
-pub struct TaggedPiece(u8);
+pub struct ColoredPiece(u8);
 
-impl TaggedPiece {
+impl ColoredPiece {
     pub fn empty() -> Self {
-        return TaggedPiece { 0: 0 };
+        return ColoredPiece { 0: 0 };
     }
 
     pub fn new(r#type: PieceType, color: Color) -> Self {
-        return TaggedPiece {
+        return ColoredPiece {
             0: (r#type as u8) ^ (color as u8),
         };
     }
@@ -49,11 +49,11 @@ impl TaggedPiece {
     }
 
     pub fn opposite_color(&self) -> Self {
-        return TaggedPiece { 0: self.0 ^ 128 };
+        return ColoredPiece { 0: self.0 ^ 128 };
     }
 }
 
-impl std::fmt::Debug for TaggedPiece {
+impl std::fmt::Debug for ColoredPiece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return write!(f, "[{:?}, {:?}]", self.get_color(), self.get_type());
     }
@@ -65,15 +65,15 @@ mod tests {
 
     #[test]
     fn empty() {
-        let empty = TaggedPiece::empty();
+        let empty = ColoredPiece::empty();
         assert_eq!(empty.0, 0);
     }
 
     #[test]
     fn get_type() {
         fn piece_type_persists(r#type: PieceType) {
-            assert_eq!(TaggedPiece::new(r#type, Color::White).get_type(), r#type);
-            assert_eq!(TaggedPiece::new(r#type, Color::Black).get_type(), r#type);
+            assert_eq!(ColoredPiece::new(r#type, Color::White).get_type(), r#type);
+            assert_eq!(ColoredPiece::new(r#type, Color::Black).get_type(), r#type);
         }
 
         piece_type_persists(PieceType::Pawn);
@@ -88,11 +88,11 @@ mod tests {
     fn get_color() {
         fn color_persists(r#type: PieceType) {
             assert_eq!(
-                TaggedPiece::new(r#type, Color::White).get_color(),
+                ColoredPiece::new(r#type, Color::White).get_color(),
                 Color::White
             );
             assert_eq!(
-                TaggedPiece::new(r#type, Color::Black).get_color(),
+                ColoredPiece::new(r#type, Color::Black).get_color(),
                 Color::Black
             );
         }
