@@ -1,4 +1,5 @@
 use crate::piece::{Color, PieceType, TaggedPiece};
+use crate::r#move::{Move, MoveType};
 
 #[allow(dead_code)]
 pub struct Board([TaggedPiece; 64]);
@@ -22,6 +23,69 @@ impl Board {
         board.place_at(4, PieceType::King);
 
         return board;
+    }
+
+    pub fn at(&self, x: u8, y: u8) -> TaggedPiece {
+        return self.0[(y * 8 + x) as usize];
+    }
+
+    pub fn get_moves_for(&self, buffer: &mut Vec<Move>, x: u8, y: u8) -> usize {
+        let piece = self.at(x, y);
+
+        match piece.get_type() {
+            PieceType::Pawn => {
+                return self.add_pawn_moves(buffer, piece.get_color(), x, y);
+            }
+            _ => {
+                return 0;
+            }
+        }
+    }
+
+    fn add_pawn_moves(&self, buffer: &mut Vec<Move>, color: Color, x: u8, y: u8) -> usize {
+        if y == 0 || y == 7 {
+            return 0;
+        }
+
+        let mut count: usize = 0;
+
+        let mut add_move = |r#move: Move| {
+            buffer.push(r#move);
+            count += 1;
+        };
+
+        let dir: i8 = if color == Color::White { 1 } else { -1 };
+
+        let y_forward = (y as i8 + dir) as u8;
+        if self.at(x, y_forward).is_empty() {
+            add_move(Move::new(x, y_forward, MoveType::Pawn));
+
+            let y_off = y as i8 + dir * 2;
+            if y_off >= 0 && y_off <= 7 {
+                let y_off = y_off as u8;
+
+                if y == 1 && self.at(x, y_off).is_empty() {
+                    add_move(Move::new(x, y_off, MoveType::Pawn));
+                }
+            }
+        }
+
+        let mut add_pawn_take = |x: u8, y: u8| {
+            let space = self.at(x, y);
+            if !space.is_empty() && space.get_color() != color {
+                add_move(Move::new(x, y, MoveType::Pawn));
+            }
+        };
+
+        if x != 7 {
+            add_pawn_take(x + 1, y_forward);
+        }
+
+        if x != 0 {
+            add_pawn_take(x - 1, y_forward);
+        }
+
+        return count;
     }
 
     pub fn print(&self) {
