@@ -32,6 +32,10 @@ impl TaggedPiece {
         };
     }
 
+    pub fn is_empty(&self) -> bool {
+        return self.0 == 0;
+    }
+
     pub fn get_type(&self) -> PieceType {
         unsafe {
             return std::mem::transmute(self.0 & 127);
