@@ -46,33 +46,21 @@ impl Board {
         return self.data[i as usize];
     }
 
-    pub fn get_moves_for(&self, buffer: &mut Vec<Move>, x: u8, y: u8) -> usize {
+    pub fn get_moves_for(&self, buffer: &mut Vec<Move>, x: u8, y: u8) -> Option<usize> {
         let piece = self.at(x, y);
 
-        match piece.get_type() {
-            PieceType::Pawn => {
-                return self.add_pawn_moves(buffer, piece.get_color(), x, y);
-            }
-            PieceType::Rook => {
-                return self.add_rook_moves(buffer, piece.get_color(), x, y);
-            }
-            PieceType::Knight => {
-                return self.add_knight_moves(buffer, piece.get_color(), x, y);
-            }
-            PieceType::Bishop => {
-                return self.add_bishop_moves(buffer, piece.get_color(), x, y);
-            }
-            PieceType::Queen => {
-                return self.add_rook_moves(buffer, piece.get_color(), x, y)
-                    + self.add_bishop_moves(buffer, piece.get_color(), x, y);
-            }
-            PieceType::King => {
-                return self.add_king_moves(buffer, piece.get_color(), x, y);
-            }
-            _ => {
-                return 0;
-            }
-        }
+        return match piece.get_type() {
+            PieceType::Pawn => Some(self.add_pawn_moves(buffer, piece.get_color(), x, y)),
+            PieceType::Rook => Some(self.add_rook_moves(buffer, piece.get_color(), x, y)),
+            PieceType::Knight => Some(self.add_knight_moves(buffer, piece.get_color(), x, y)),
+            PieceType::Bishop => Some(self.add_bishop_moves(buffer, piece.get_color(), x, y)),
+            PieceType::Queen => Some(
+                self.add_rook_moves(buffer, piece.get_color(), x, y)
+                    + self.add_bishop_moves(buffer, piece.get_color(), x, y),
+            ),
+            PieceType::King => Some(self.add_king_moves(buffer, piece.get_color(), x, y)),
+            _ => return None,
+        };
     }
 
     fn add_pawn_moves(&self, buffer: &mut Vec<Move>, color: Color, x: u8, y: u8) -> usize {

@@ -61,7 +61,7 @@ fn pawn_moves_new_board() {
                 move_to(x, (y_start as i8 + y_dir * 2) as u8),
             ];
 
-            let count = board.get_moves_for(&mut moves, x, y_start);
+            let count = board.get_moves_for(&mut moves, x, y_start).unwrap();
             assert_eq!(count, correct_moves.len());
 
             for (i, m) in moves.iter().enumerate() {
@@ -81,10 +81,10 @@ fn rook_moves_new_board() {
     let board = Board::new();
 
     let mut moves = Vec::<Move>::new();
-    assert_eq!(board.get_moves_for(&mut moves, 0, 0), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 7, 0), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 0, 7), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 7, 7), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 0, 0).unwrap(), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 7, 0).unwrap(), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 0, 7).unwrap(), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 7, 7).unwrap(), 0);
 }
 
 #[test]
@@ -99,7 +99,7 @@ fn knight_moves_new_board() {
             Move::Move(from, Pos::from_xy(x - 1, end_y)),
         ];
 
-        assert_eq!(board.get_moves_for(&mut moves, x, y), 2);
+        assert_eq!(board.get_moves_for(&mut moves, x, y).unwrap(), 2);
         for (i, m) in moves.iter().enumerate() {
             assert_eq!(m, &correct_moves[i]);
         }
@@ -117,10 +117,10 @@ fn bishop_moves_new_board() {
     let board = Board::new();
 
     let mut moves = Vec::<Move>::new();
-    assert_eq!(board.get_moves_for(&mut moves, 2, 0), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 5, 0), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 2, 7), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 5, 7), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 2, 0).unwrap(), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 5, 0).unwrap(), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 2, 7).unwrap(), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 5, 7).unwrap(), 0);
 }
 
 #[test]
@@ -128,8 +128,8 @@ fn queen_moves_new_board() {
     let board = Board::new();
 
     let mut moves = Vec::<Move>::new();
-    assert_eq!(board.get_moves_for(&mut moves, 3, 0), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 3, 7), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 3, 0).unwrap(), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 3, 7).unwrap(), 0);
 }
 
 #[test]
@@ -137,6 +137,6 @@ fn king_moves_new_board() {
     let board = Board::new();
 
     let mut moves = Vec::<Move>::new();
-    assert_eq!(board.get_moves_for(&mut moves, 4, 0), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 4, 7), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 4, 0).unwrap(), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 4, 7).unwrap(), 0);
 }
