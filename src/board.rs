@@ -54,6 +54,9 @@ impl Board {
             PieceType::Knight => {
                 return self.add_knight_moves(buffer, piece.get_color(), x, y);
             }
+            PieceType::Bishop => {
+                return self.add_bishop_moves(buffer, piece.get_color(), x, y);
+            }
             _ => {
                 return 0;
             }
@@ -171,6 +174,43 @@ impl Board {
         add_move(1, -1);
         add_move(-1, -1);
         add_move(-1, 1);
+
+        return count;
+    }
+
+    fn add_bishop_moves(&self, buffer: &mut Vec<Move>, color: Color, x: u8, y: u8) -> usize {
+        use std::cmp::min;
+
+        let from = Pos::from_xy(x, y);
+        let mut count = 0;
+        let mut check = |x_dir: i8, y_dir: i8, dist: u8| {
+            for off in 1..dist {
+                let x = (x as i8 + (off as i8 * x_dir as i8)) as u8;
+                let y = (y as i8 + (off as i8 * y_dir as i8)) as u8;
+                let piece = self.at(x, y);
+
+                if piece.is_empty() || piece.get_color() != color {
+                    buffer.push(Move::Move(from, Pos::from_xy(x, y)));
+                    count += 1;
+                }
+
+                if !piece.is_empty() {
+                    break;
+                }
+            }
+        };
+
+        // NW
+        check(-1, -1, min(x, y));
+
+        // NE
+        check(1, -1, min(8 - x, y));
+
+        // SE
+        check(1, 1, min(8 - x, 8 - y));
+
+        // SW
+        check(-1, 1, min(x, 8 - y));
 
         return count;
     }

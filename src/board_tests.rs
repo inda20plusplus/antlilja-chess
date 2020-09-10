@@ -111,3 +111,14 @@ fn knight_moves_new_board() {
     check(1, 7, 5);
     check(6, 7, 5);
 }
+
+#[test]
+fn bishop_moves_new_board() {
+    let board = Board::new();
+
+    let mut moves = Vec::<Move>::new();
+    assert_eq!(board.get_moves_for(&mut moves, 2, 0), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 5, 0), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 2, 7), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 5, 7), 0);
+}
