@@ -122,3 +122,13 @@ fn bishop_moves_new_board() {
     assert_eq!(board.get_moves_for(&mut moves, 2, 7), 0);
     assert_eq!(board.get_moves_for(&mut moves, 5, 7), 0);
 }
+
+#[test]
+fn queen_moves_new_board() {
+    let board = Board::new();
+
+    let mut moves = Vec::<Move>::new();
+    assert_eq!(board.get_moves_for(&mut moves, 3, 0), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 3, 7), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 3, 7), 0);
+}

@@ -57,6 +57,10 @@ impl Board {
             PieceType::Bishop => {
                 return self.add_bishop_moves(buffer, piece.get_color(), x, y);
             }
+            PieceType::Queen => {
+                return self.add_rook_moves(buffer, piece.get_color(), x, y)
+                    + self.add_bishop_moves(buffer, piece.get_color(), x, y);
+            }
             _ => {
                 return 0;
             }
