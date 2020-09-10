@@ -267,11 +267,13 @@ impl Board {
         return count;
     }
 
-    pub fn print(&self) {
-        for i in 0..8 {
-            let start = i * 8;
-            let end = start + 8;
-            println!("{:?}", &self.data[start..end]);
+    pub fn print_ascii(&self) {
+        for y in (0..8).rev() {
+            print!("| ");
+            for x in 0..8 {
+                print!("{:?} ", self.at(x, y));
+            }
+            println!("|")
         }
     }
 }

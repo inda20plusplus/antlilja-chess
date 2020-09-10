@@ -65,7 +65,21 @@ impl TaggedPiece {
 
 impl std::fmt::Debug for TaggedPiece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "[{:?}, {:?}]", self.get_color(), self.get_type());
+        let mut c = match self.get_type() {
+            PieceType::Pawn => 'P',
+            PieceType::Rook => 'R',
+            PieceType::Knight => 'N',
+            PieceType::Bishop => 'B',
+            PieceType::Queen => 'Q',
+            PieceType::King => 'K',
+            _ => '.',
+        };
+
+        if self.get_color() == Color::Black {
+            c = c.to_ascii_lowercase();
+        }
+
+        return write!(f, "{}", c);
     }
 }
 
