@@ -2,10 +2,8 @@ use crate::piece::{Color, ColoredPiece, PieceType};
 use crate::pos::Pos;
 use crate::r#move::Move;
 
-#[allow(dead_code)]
 pub struct Board([ColoredPiece; 64]);
 
-#[allow(dead_code)]
 impl Board {
     pub fn new() -> Self {
         let mut board = Board {
