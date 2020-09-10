@@ -2,22 +2,26 @@ use crate::piece::{Color, PieceType, TaggedPiece};
 use crate::pos::Pos;
 use crate::r#move::Move;
 
-pub struct Board([TaggedPiece; 64]);
+pub struct Board {
+    data: [TaggedPiece; 64],
+    history: Vec<Move>,
+}
 
 impl Board {
     pub fn new() -> Self {
         let mut board = Board {
-            0: [TaggedPiece::empty(); 64],
+            data: [TaggedPiece::empty(); 64],
+            history: Vec::<Move>::with_capacity(64),
         };
 
         for i in 0..8 {
-            board.0[8 + i] = TaggedPiece::original(PieceType::Pawn, Color::White);
-            board.0[8 * 6 + i] = TaggedPiece::original(PieceType::Pawn, Color::Black);
+            board.data[8 + i] = TaggedPiece::original(PieceType::Pawn, Color::White);
+            board.data[8 * 6 + i] = TaggedPiece::original(PieceType::Pawn, Color::Black);
         }
 
         let mut place_at_both_sides = |offset, r#type| {
-            board.0[offset] = TaggedPiece::original(r#type, Color::White);
-            board.0[8 * 7 + offset] = TaggedPiece::original(r#type, Color::Black);
+            board.data[offset] = TaggedPiece::original(r#type, Color::White);
+            board.data[8 * 7 + offset] = TaggedPiece::original(r#type, Color::Black);
         };
 
         let mut place_matching_at_both_sides = |offset, r#type| {
@@ -35,12 +39,13 @@ impl Board {
     }
 
     pub fn at(&self, x: u8, y: u8) -> TaggedPiece {
-        return self.0[(y * 8 + x) as usize];
+        return self.data[(y * 8 + x) as usize];
     }
 
     pub fn at_index(&self, i: u8) -> TaggedPiece {
-        return self.0[i as usize];
+        return self.data[i as usize];
     }
+
     pub fn get_moves_for(&self, buffer: &mut Vec<Move>, x: u8, y: u8) -> usize {
         let piece = self.at(x, y);
 
@@ -123,7 +128,7 @@ impl Board {
         let mut count = 0;
         let mut loop_internal = |x, y| {
             let i = y * 8 + x;
-            let space = self.0[i as usize];
+            let space = self.data[i as usize];
             if space.is_empty() || space.get_color() != color {
                 buffer.push(Move::Move(from, Pos::from_xy(x, y)));
                 count += 1;
@@ -169,7 +174,7 @@ impl Board {
             if (0..8).contains(&to_x) && (0..8).contains(&to_y) {
                 let to_x = to_x as u8;
                 let to_y = to_y as u8;
-                let piece = self.0[(to_y * 8 + to_x) as usize];
+                let piece = self.data[(to_y * 8 + to_x) as usize];
                 if piece.is_empty() || piece.get_color() != color {
                     buffer.push(Move::Move(from, Pos::from_xy(to_x, to_y)));
                     count += 1;
@@ -253,7 +258,7 @@ impl Board {
         for i in 0..8 {
             let start = i * 8;
             let end = start + 8;
-            println!("{:?}", &self.0[start..end]);
+            println!("{:?}", &self.data[start..end]);
         }
     }
 }
