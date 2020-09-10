@@ -75,3 +75,14 @@ fn pawn_moves_new_board() {
         check_side(6, -1);
     }
 }
+
+#[test]
+fn rook_moves_new_board() {
+    let board = Board::new();
+
+    let mut moves = Vec::<Move>::new();
+    assert_eq!(board.get_moves_for(&mut moves, 0, 0), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 7, 0), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 0, 7), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 7, 7), 0);
+}

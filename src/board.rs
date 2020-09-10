@@ -48,6 +48,9 @@ impl Board {
             PieceType::Pawn => {
                 return self.add_pawn_moves(buffer, piece.get_color(), x, y);
             }
+            PieceType::Rook => {
+                return self.add_rook_moves(buffer, piece.get_color(), x, y);
+            }
             _ => {
                 return 0;
             }
@@ -96,6 +99,48 @@ impl Board {
 
         if x != 0 {
             add_pawn_take(x - 1, y_forward);
+        }
+
+        return count;
+    }
+
+    fn add_rook_moves(&self, buffer: &mut Vec<Move>, color: Color, x: u8, y: u8) -> usize {
+        let from = Pos::from_xy(x, y);
+
+        let mut count = 0;
+        let mut loop_internal = |x, y| {
+            let i = y * 8 + x;
+            let space = self.0[i as usize];
+            if space.is_empty() || space.get_color() != color {
+                buffer.push(Move::Move(from, Pos::from_xy(x, y)));
+                count += 1;
+            }
+
+            return space.is_empty();
+        };
+
+        for x in (x + 1)..8 {
+            if !loop_internal(x, y) {
+                break;
+            }
+        }
+
+        for x in x..0 {
+            if !loop_internal(x, y) {
+                break;
+            }
+        }
+
+        for y in (y + 1)..8 {
+            if !loop_internal(x, y) {
+                break;
+            }
+        }
+
+        for y in y..0 {
+            if !loop_internal(x, y) {
+                break;
+            }
         }
 
         return count;
