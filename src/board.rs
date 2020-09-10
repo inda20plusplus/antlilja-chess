@@ -17,11 +17,21 @@ impl Board {
             board.0[8 * 6 + i] = ColoredPiece::new(PieceType::Pawn, Color::Black);
         }
 
-        board.place_matching_at(0, PieceType::Rook);
-        board.place_matching_at(1, PieceType::Knight);
-        board.place_matching_at(2, PieceType::Bishop);
-        board.place_at(3, PieceType::Queen);
-        board.place_at(4, PieceType::King);
+        let mut place_at_both_sides = |offset, r#type| {
+            board.0[offset] = ColoredPiece::new(r#type, Color::White);
+            board.0[8 * 7 + offset] = ColoredPiece::new(r#type, Color::Black);
+        };
+
+        let mut place_matching_at_both_sides = |offset, r#type| {
+            place_at_both_sides(offset, r#type);
+            place_at_both_sides(7 - offset, r#type);
+        };
+
+        place_matching_at_both_sides(0, PieceType::Rook);
+        place_matching_at_both_sides(1, PieceType::Knight);
+        place_matching_at_both_sides(2, PieceType::Bishop);
+        place_at_both_sides(3, PieceType::Queen);
+        place_at_both_sides(4, PieceType::King);
 
         return board;
     }
@@ -97,16 +107,6 @@ impl Board {
             println!("{:?}", &self.0[start..end]);
         }
     }
-
-    fn place_at(&mut self, offset: usize, r#type: PieceType) {
-        self.0[offset] = ColoredPiece::new(r#type, Color::White);
-        self.0[8 * 7 + offset] = ColoredPiece::new(r#type, Color::White);
-    }
-
-    fn place_matching_at(&mut self, offset: usize, r#type: PieceType) {
-        self.place_at(offset, r#type);
-        self.place_at(7 - offset, r#type);
-    }
 }
 
 #[cfg(test)]
@@ -117,7 +117,7 @@ mod tests {
         assert_eq!(board.0[offset], ColoredPiece::new(r#type, Color::White));
         assert_eq!(
             board.0[8 * 7 + offset],
-            ColoredPiece::new(r#type, Color::White)
+            ColoredPiece::new(r#type, Color::Black)
         );
     }
 
