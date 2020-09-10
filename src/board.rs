@@ -52,7 +52,7 @@ impl Board {
         return match piece.get_type() {
             PieceType::Pawn => Some(self.add_pawn_moves(buffer, piece.get_color(), x, y)),
             PieceType::Rook => Some(self.add_rook_moves(buffer, piece.get_color(), x, y)),
-            PieceType::Knight => Some(self.add_knight_moves(buffer, piece.get_color(), x, y)),
+            PieceType::Knight => Some(self.add_knight_moves(buffer, piece, x, y)),
             PieceType::Bishop => Some(self.add_bishop_moves(buffer, piece.get_color(), x, y)),
             PieceType::Queen => Some(
                 self.add_rook_moves(buffer, piece.get_color(), x, y)
@@ -152,28 +152,53 @@ impl Board {
         return count;
     }
 
-    fn add_knight_moves(&self, buffer: &mut Vec<Move>, color: Color, x: u8, y: u8) -> usize {
+    fn add_knight_moves(&self, buffer: &mut Vec<Move>, piece: TaggedPiece, x: u8, y: u8) -> usize {
+        let color = piece.get_color();
         let from = Pos::from_xy(x, y);
 
         let mut count = 0;
-        let mut add_move = |x_dir: i8, y_dir: i8| {
+        let mut add_move = |m| {
+            buffer.push(m);
+            count += 1;
+        };
+
+        let mut add_move_move = |x_dir: i8, y_dir: i8| {
             let to_x = x as i8 + x_dir;
             let to_y = y as i8 + y_dir * 2;
             if (0..8).contains(&to_x) && (0..8).contains(&to_y) {
                 let to_x = to_x as u8;
                 let to_y = to_y as u8;
-                let piece = self.data[(to_y * 8 + to_x) as usize];
-                if piece.is_empty() || piece.get_color() != color {
-                    buffer.push(Move::Move(from, Pos::from_xy(to_x, to_y)));
-                    count += 1;
+                let space = self.data[(to_y * 8 + to_x) as usize];
+                if space.is_empty() || space.get_color() != color {
+                    add_move(Move::Move(from, Pos::from_xy(to_x, to_y)));
                 }
             };
         };
 
-        add_move(1, 1);
-        add_move(1, -1);
-        add_move(-1, -1);
-        add_move(-1, 1);
+        add_move_move(1, 1);
+        add_move_move(1, -1);
+        add_move_move(-1, -1);
+        add_move_move(-1, 1);
+
+        let empty_at = |x, y| {
+            return self.at(x, y).is_empty();
+        };
+
+        let mut add_castling_move = |y| {
+            if self.at(0, y).is_original() && empty_at(1, y) && empty_at(2, y) && empty_at(3, y) {
+                add_move(Move::QueenSideCastling);
+            }
+
+            if self.at(7, y).is_original() && empty_at(5, y) && empty_at(6, y) {
+                add_move(Move::KingSideCastling);
+            }
+        };
+
+        if color == Color::White {
+            add_castling_move(0);
+        } else {
+            add_castling_move(7);
+        }
 
         return count;
     }
