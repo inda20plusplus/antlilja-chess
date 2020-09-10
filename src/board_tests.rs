@@ -130,5 +130,13 @@ fn queen_moves_new_board() {
     let mut moves = Vec::<Move>::new();
     assert_eq!(board.get_moves_for(&mut moves, 3, 0), 0);
     assert_eq!(board.get_moves_for(&mut moves, 3, 7), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 3, 7), 0);
+}
+
+#[test]
+fn king_moves_new_board() {
+    let board = Board::new();
+
+    let mut moves = Vec::<Move>::new();
+    assert_eq!(board.get_moves_for(&mut moves, 4, 0), 0);
+    assert_eq!(board.get_moves_for(&mut moves, 4, 7), 0);
 }

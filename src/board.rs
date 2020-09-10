@@ -61,6 +61,9 @@ impl Board {
                 return self.add_rook_moves(buffer, piece.get_color(), x, y)
                     + self.add_bishop_moves(buffer, piece.get_color(), x, y);
             }
+            PieceType::King => {
+                return self.add_king_moves(buffer, piece.get_color(), x, y);
+            }
             _ => {
                 return 0;
             }
@@ -215,6 +218,33 @@ impl Board {
 
         // SW
         check(-1, 1, min(x, 8 - y));
+
+        return count;
+    }
+
+    fn add_king_moves(&self, buffer: &mut Vec<Move>, color: Color, x: u8, y: u8) -> usize {
+        let mut count = 0;
+
+        let mut check = |x_dir: i8, y_dir: i8| {
+            let to_x = x as i8 + x_dir;
+            let to_y = y as i8 + y_dir;
+            if (0..8).contains(&to_x) && (0..8).contains(&to_y) {
+                let piece = self.at(to_x as u8, to_y as u8);
+
+                if piece.is_empty() || piece.get_color() != color {
+                    buffer.push(Move::Move(
+                        Pos::from_xy(x, y),
+                        Pos::from_xy(to_x as u8, to_y as u8),
+                    ));
+                    count += 1;
+                }
+            }
+        };
+
+        check(1, 1);
+        check(-1, 1);
+        check(-1, -1);
+        check(1, -1);
 
         return count;
     }
