@@ -38,6 +38,9 @@ impl Board {
         return self.0[(y * 8 + x) as usize];
     }
 
+    pub fn at_index(&self, i: u8) -> ColoredPiece {
+        return self.0[i as usize];
+    }
     pub fn get_moves_for(&self, buffer: &mut Vec<Move>, x: u8, y: u8) -> usize {
         let piece = self.at(x, y);
 
