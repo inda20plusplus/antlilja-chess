@@ -11,13 +11,13 @@ impl Board {
         };
 
         for i in 0..8 {
-            board.0[8 + i] = TaggedPiece::new(PieceType::Pawn, Color::White);
-            board.0[8 * 6 + i] = TaggedPiece::new(PieceType::Pawn, Color::Black);
+            board.0[8 + i] = TaggedPiece::original(PieceType::Pawn, Color::White);
+            board.0[8 * 6 + i] = TaggedPiece::original(PieceType::Pawn, Color::Black);
         }
 
         let mut place_at_both_sides = |offset, r#type| {
-            board.0[offset] = TaggedPiece::new(r#type, Color::White);
-            board.0[8 * 7 + offset] = TaggedPiece::new(r#type, Color::Black);
+            board.0[offset] = TaggedPiece::original(r#type, Color::White);
+            board.0[8 * 7 + offset] = TaggedPiece::original(r#type, Color::Black);
         };
 
         let mut place_matching_at_both_sides = |offset, r#type| {

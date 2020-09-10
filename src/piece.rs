@@ -32,13 +32,23 @@ impl TaggedPiece {
         };
     }
 
+    pub fn original(r#type: PieceType, color: Color) -> Self {
+        return TaggedPiece {
+            0: ((r#type as u8) ^ (color as u8)) ^ 64,
+        };
+    }
+
     pub fn is_empty(&self) -> bool {
         return self.0 == 0;
     }
 
+    pub fn is_original(&self) -> bool {
+        return (self.0 & 64) == 64;
+    }
+
     pub fn get_type(&self) -> PieceType {
         unsafe {
-            return std::mem::transmute(self.0 & 127);
+            return std::mem::transmute(self.0 & 63);
         }
     }
 
@@ -72,8 +82,14 @@ mod tests {
     #[test]
     fn get_type() {
         fn piece_type_persists(r#type: PieceType) {
-            assert_eq!(TaggedPiece::new(r#type, Color::White).get_type(), r#type);
-            assert_eq!(TaggedPiece::new(r#type, Color::Black).get_type(), r#type);
+            assert_eq!(
+                TaggedPiece::original(r#type, Color::White).get_type(),
+                r#type
+            );
+            assert_eq!(
+                TaggedPiece::original(r#type, Color::Black).get_type(),
+                r#type
+            );
         }
 
         piece_type_persists(PieceType::Pawn);
@@ -88,11 +104,11 @@ mod tests {
     fn get_color() {
         fn color_persists(r#type: PieceType) {
             assert_eq!(
-                TaggedPiece::new(r#type, Color::White).get_color(),
+                TaggedPiece::original(r#type, Color::White).get_color(),
                 Color::White
             );
             assert_eq!(
-                TaggedPiece::new(r#type, Color::Black).get_color(),
+                TaggedPiece::original(r#type, Color::Black).get_color(),
                 Color::Black
             );
         }
