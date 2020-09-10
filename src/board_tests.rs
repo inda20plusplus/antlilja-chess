@@ -86,3 +86,28 @@ fn rook_moves_new_board() {
     assert_eq!(board.get_moves_for(&mut moves, 0, 7), 0);
     assert_eq!(board.get_moves_for(&mut moves, 7, 7), 0);
 }
+
+#[test]
+fn knight_moves_new_board() {
+    let board = Board::new();
+    let mut moves = Vec::<Move>::with_capacity(2);
+
+    let mut check = |x, y, end_y| {
+        let from = Pos::from_xy(x, y);
+        let correct_moves = [
+            Move::Move(from, Pos::from_xy(x + 1, end_y)),
+            Move::Move(from, Pos::from_xy(x - 1, end_y)),
+        ];
+
+        assert_eq!(board.get_moves_for(&mut moves, x, y), 2);
+        for (i, m) in moves.iter().enumerate() {
+            assert_eq!(m, &correct_moves[i]);
+        }
+        moves.clear();
+    };
+
+    check(1, 0, 2);
+    check(6, 0, 2);
+    check(1, 7, 5);
+    check(6, 7, 5);
+}
