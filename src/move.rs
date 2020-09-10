@@ -3,8 +3,8 @@ use crate::pos::Pos;
 
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Move {
-    Move(PieceType, Pos),
-    PawnPromotion(PieceType, Pos),
+    Move(Pos, Pos),
+    PawnPromotion(PieceType, Pos, Pos),
     KingSideCastling,
     QueenSideCastling,
 }

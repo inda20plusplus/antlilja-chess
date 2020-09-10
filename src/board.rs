@@ -48,10 +48,11 @@ impl Board {
             return 0;
         }
 
-        let mut count: usize = 0;
+        let from = Pos::from_xy(x, y);
 
-        let mut add_move = |r#move: Move| {
-            buffer.push(r#move);
+        let mut count: usize = 0;
+        let mut add_pawn_move = |to| {
+            buffer.push(Move::Move(from, to));
             count += 1;
         };
 
@@ -59,14 +60,14 @@ impl Board {
 
         let y_forward = (y as i8 + dir) as u8;
         if self.at(x, y_forward).is_empty() {
-            add_move(Move::Move(PieceType::Pawn, Pos::from_xy(x, y)));
+            add_pawn_move(Pos::from_xy(x, y_forward));
 
             let y_off = y as i8 + dir * 2;
             if y_off >= 0 && y_off <= 7 {
                 let y_off = y_off as u8;
 
                 if y == 1 && self.at(x, y_off).is_empty() {
-                    add_move(Move::Move(PieceType::Pawn, Pos::from_xy(x, y_off)));
+                    add_pawn_move(Pos::from_xy(x, y_off));
                 }
             }
         }
@@ -74,7 +75,7 @@ impl Board {
         let mut add_pawn_take = |x: u8, y: u8| {
             let space = self.at(x, y);
             if !space.is_empty() && space.get_color() != color {
-                add_move(Move::Move(PieceType::Pawn, Pos::from_xy(x, y)));
+                add_pawn_move(Pos::from_xy(x, y));
             }
         };
 
