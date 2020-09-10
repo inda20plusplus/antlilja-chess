@@ -74,7 +74,7 @@ impl Board {
             add_pawn_move(Pos::from_xy(x, y_forward));
 
             let y_off = y as i8 + dir * 2;
-            if y_off >= 0 && y_off <= 7 {
+            if (0..8).contains(&y_off) {
                 let y_off = y_off as u8;
 
                 if y == 1 && self.at(x, y_off).is_empty() {
