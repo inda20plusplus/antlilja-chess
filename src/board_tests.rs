@@ -7,11 +7,11 @@ fn new_board() {
     let exists_at_both_sides = |offset, r#type| {
         assert_eq!(
             board.at_index(offset),
-            ColoredPiece::new(r#type, Color::White)
+            TaggedPiece::new(r#type, Color::White)
         );
         assert_eq!(
             board.at_index(8 * 7 + offset),
-            ColoredPiece::new(r#type, Color::Black)
+            TaggedPiece::new(r#type, Color::Black)
         );
     };
 
@@ -23,16 +23,16 @@ fn new_board() {
     for i in 0..8 {
         assert_eq!(
             board.at_index(8 + i),
-            ColoredPiece::new(PieceType::Pawn, Color::White)
+            TaggedPiece::new(PieceType::Pawn, Color::White)
         );
         assert_eq!(
             board.at_index(8 * 6 + i),
-            ColoredPiece::new(PieceType::Pawn, Color::Black)
+            TaggedPiece::new(PieceType::Pawn, Color::Black)
         );
     }
 
     for i in 8 * 2..8 * 6 {
-        assert_eq!(board.at_index(i), ColoredPiece::empty());
+        assert_eq!(board.at_index(i), TaggedPiece::empty());
     }
 
     exists_matching_at_both_sides(0, PieceType::Rook);

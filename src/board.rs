@@ -1,23 +1,23 @@
-use crate::piece::{Color, ColoredPiece, PieceType};
+use crate::piece::{Color, PieceType, TaggedPiece};
 use crate::pos::Pos;
 use crate::r#move::Move;
 
-pub struct Board([ColoredPiece; 64]);
+pub struct Board([TaggedPiece; 64]);
 
 impl Board {
     pub fn new() -> Self {
         let mut board = Board {
-            0: [ColoredPiece::empty(); 64],
+            0: [TaggedPiece::empty(); 64],
         };
 
         for i in 0..8 {
-            board.0[8 + i] = ColoredPiece::new(PieceType::Pawn, Color::White);
-            board.0[8 * 6 + i] = ColoredPiece::new(PieceType::Pawn, Color::Black);
+            board.0[8 + i] = TaggedPiece::new(PieceType::Pawn, Color::White);
+            board.0[8 * 6 + i] = TaggedPiece::new(PieceType::Pawn, Color::Black);
         }
 
         let mut place_at_both_sides = |offset, r#type| {
-            board.0[offset] = ColoredPiece::new(r#type, Color::White);
-            board.0[8 * 7 + offset] = ColoredPiece::new(r#type, Color::Black);
+            board.0[offset] = TaggedPiece::new(r#type, Color::White);
+            board.0[8 * 7 + offset] = TaggedPiece::new(r#type, Color::Black);
         };
 
         let mut place_matching_at_both_sides = |offset, r#type| {
@@ -34,11 +34,11 @@ impl Board {
         return board;
     }
 
-    pub fn at(&self, x: u8, y: u8) -> ColoredPiece {
+    pub fn at(&self, x: u8, y: u8) -> TaggedPiece {
         return self.0[(y * 8 + x) as usize];
     }
 
-    pub fn at_index(&self, i: u8) -> ColoredPiece {
+    pub fn at_index(&self, i: u8) -> TaggedPiece {
         return self.0[i as usize];
     }
     pub fn get_moves_for(&self, buffer: &mut Vec<Move>, x: u8, y: u8) -> usize {
