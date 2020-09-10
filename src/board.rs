@@ -77,7 +77,7 @@ impl Board {
             if (0..8).contains(&y_off) {
                 let y_off = y_off as u8;
 
-                if y == 1 && self.at(x, y_off).is_empty() {
+                if (y == 1 || y == 6) && self.at(x, y_off).is_empty() {
                     add_pawn_move(Pos::from_xy(x, y_off));
                 }
             }
