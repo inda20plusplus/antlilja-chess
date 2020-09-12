@@ -6,6 +6,10 @@ impl Pos {
         return Pos { 0: y * 8 + x };
     }
 
+    pub fn from_index(i: u8) -> Self {
+        return Self { 0: i };
+    }
+
     pub fn as_index(&self) -> usize {
         return self.0 as usize;
     }
