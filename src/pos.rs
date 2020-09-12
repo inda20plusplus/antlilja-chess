@@ -3,11 +3,17 @@ pub struct Pos(u8);
 
 impl Pos {
     pub fn from_xy(x: u8, y: u8) -> Self {
-        return Pos { 0: x | (y << 4) };
+        return Pos { 0: y * 8 + x };
+    }
+
+    pub fn as_index(&self) -> usize {
+        return self.0 as usize;
     }
 
     pub fn to_xy(&self) -> (u8, u8) {
-        return (self.0 & 15, self.0 >> 4);
+        let y = self.0 / 8;
+        let x = self.0 - (y * 8);
+        return (x, y);
     }
 }
 

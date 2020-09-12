@@ -1,17 +1,22 @@
+use crate::move_map::{MoveArray, MoveMap};
 use crate::piece::{Color, PieceType, TaggedPiece};
 use crate::pos::Pos;
 use crate::r#move::Move;
 
 pub struct Board {
     data: [TaggedPiece; 64],
+    move_map: MoveMap,
     history: Vec<Move>,
+    color: Color,
 }
 
 impl Board {
     pub fn new() -> Self {
         let mut board = Board {
             data: [TaggedPiece::empty(); 64],
-            history: Vec::<Move>::with_capacity(64),
+            move_map: MoveMap::new(),
+            history: Vec::<Move>::with_capacity(50),
+            color: Color::White,
         };
 
         for i in 0..8 {
@@ -38,45 +43,112 @@ impl Board {
         return board;
     }
 
+    pub fn flip_color(&mut self) {
+        self.color.flip();
+    }
+
+    pub fn play(&mut self, x: u8, y: u8, index: usize) -> bool {
+        let pos = Pos::from_xy(x, y);
+
+        if pos.as_index() >= 64 || self.at_pos(pos).is_empty() {
+            return false;
+        }
+        let moves: &MoveArray = if self.move_map.at(pos).is_empty() {
+            self.get_moves_for(x, y);
+            &self.move_map.at(pos)
+        } else {
+            &self.move_map.at(pos)
+        };
+
+        if index >= moves.size() {
+            return false;
+        }
+
+        let r#move = moves.at(index);
+
+        match r#move {
+            Move::Move(from, to) => {
+                let to = to.as_index();
+                let from = from.as_index();
+                self.data[to] = self.data[from];
+                self.data[from] = TaggedPiece::empty();
+            }
+            _ => {
+                return false;
+            }
+        }
+
+        self.history.push(*r#move);
+        self.move_map.clear();
+        self.color.flip();
+        return true;
+    }
+
     pub fn at(&self, x: u8, y: u8) -> TaggedPiece {
         return self.data[(y * 8 + x) as usize];
+    }
+
+    pub fn at_pos(&self, pos: Pos) -> TaggedPiece {
+        return self.data[pos.as_index()];
     }
 
     pub fn at_index(&self, i: u8) -> TaggedPiece {
         return self.data[i as usize];
     }
 
-    pub fn get_moves_for(&self, buffer: &mut Vec<Move>, x: u8, y: u8) -> Option<usize> {
-        let piece = self.at(x, y);
-
-        return match piece.get_type() {
-            PieceType::Pawn => Some(self.add_pawn_moves(buffer, piece.get_color(), x, y)),
-            PieceType::Rook => Some(self.add_rook_moves(buffer, piece.get_color(), x, y)),
-            PieceType::Knight => Some(self.add_knight_moves(buffer, piece, x, y)),
-            PieceType::Bishop => Some(self.add_bishop_moves(buffer, piece.get_color(), x, y)),
-            PieceType::Queen => Some(
-                self.add_rook_moves(buffer, piece.get_color(), x, y)
-                    + self.add_bishop_moves(buffer, piece.get_color(), x, y),
-            ),
-            PieceType::King => Some(self.add_king_moves(buffer, piece.get_color(), x, y)),
-            _ => return None,
-        };
-    }
-
-    fn add_pawn_moves(&self, buffer: &mut Vec<Move>, color: Color, x: u8, y: u8) -> usize {
-        if y == 0 || y == 7 {
-            return 0;
+    pub fn get_moves_for(&mut self, x: u8, y: u8) -> Option<&MoveArray> {
+        let pos = Pos::from_xy(x, y);
+        if !self.move_map.at(pos).is_empty() {
+            return Some(&self.move_map.at(pos));
         }
 
-        let from = Pos::from_xy(x, y);
+        let piece = self.at_pos(pos);
 
-        let mut count: usize = 0;
-        let mut add_pawn_move = |to| {
-            buffer.push(Move::Move(from, to));
-            count += 1;
+        if piece.get_color() != self.color {
+            return None;
+        }
+
+        let mut moves = MoveArray::empty();
+
+        match piece.get_type() {
+            PieceType::Pawn => {
+                self.add_pawn_moves(&mut moves, x, y);
+            }
+            PieceType::Rook => {
+                self.add_direction_moves(&mut moves, x, y, (0, 1), true);
+                self.add_direction_moves(&mut moves, x, y, (1, 0), true);
+            }
+            PieceType::Knight => {
+                self.add_direction_moves(&mut moves, x, y, (1, 2), false);
+                self.add_direction_moves(&mut moves, x, y, (2, 1), false);
+            }
+            PieceType::Bishop => {
+                self.add_direction_moves(&mut moves, x, y, (1, 1), true);
+            }
+            PieceType::Queen => {
+                self.add_direction_moves(&mut moves, x, y, (0, 1), true);
+                self.add_direction_moves(&mut moves, x, y, (1, 0), true);
+                self.add_direction_moves(&mut moves, x, y, (1, 1), true);
+            }
+            PieceType::King => {
+                self.add_direction_moves(&mut moves, x, y, (1, 0), false);
+                self.add_direction_moves(&mut moves, x, y, (0, 1), false);
+                self.add_castling_moves(&mut moves);
+            }
+            _ => return None,
         };
 
-        let dir: i8 = if color == Color::White { 1 } else { -1 };
+        return Some(self.move_map.insert(pos, moves));
+    }
+
+    fn add_pawn_moves(&self, buffer: &mut MoveArray, x: u8, y: u8) {
+        let from = Pos::from_xy(x, y);
+
+        let mut add_pawn_move = |to| {
+            buffer.push(Move::Move(from, to));
+        };
+
+        let dir: i8 = if self.color == Color::White { 1 } else { -1 };
 
         let y_forward = (y as i8 + dir) as u8;
         if self.at(x, y_forward).is_empty() {
@@ -94,7 +166,7 @@ impl Board {
 
         let mut add_pawn_take = |x: u8, y: u8| {
             let space = self.at(x, y);
-            if !space.is_empty() && space.get_color() != color {
+            if !space.is_empty() && space.get_color() != self.color {
                 add_pawn_move(Pos::from_xy(x, y));
             }
         };
@@ -106,165 +178,82 @@ impl Board {
         if x != 0 {
             add_pawn_take(x - 1, y_forward);
         }
-
-        return count;
     }
 
-    fn add_rook_moves(&self, buffer: &mut Vec<Move>, color: Color, x: u8, y: u8) -> usize {
+    fn add_direction_moves(
+        &self,
+        buffer: &mut MoveArray,
+        x: u8,
+        y: u8,
+        step: (i8, i8),
+        r#loop: bool,
+    ) {
         let from = Pos::from_xy(x, y);
 
-        let mut count = 0;
-        let mut loop_internal = |x, y| {
-            let i = y * 8 + x;
-            let space = self.data[i as usize];
-            if space.is_empty() || space.get_color() != color {
+        let mut add_move = |dir: &(i8, i8)| {
+            let x = x as i8 + (dir.0 * step.0);
+            let y = y as i8 + (dir.1 * step.1);
+
+            if !(0..8).contains(&x) || !(0..8).contains(&y) {
+                return false;
+            }
+
+            let x = x as u8;
+            let y = y as u8;
+
+            let piece = self.at(x, y);
+
+            if piece.is_empty() || piece.get_color() != self.color {
                 buffer.push(Move::Move(from, Pos::from_xy(x, y)));
-                count += 1;
             }
 
-            return space.is_empty();
+            return piece.is_empty();
         };
 
-        for x in (x + 1)..8 {
-            if !loop_internal(x, y) {
-                break;
-            }
-        }
+        let directions: [(i8, i8); 4] = [(-1, -1), (1, -1), (1, 1), (-1, 1)];
 
-        for x in x..0 {
-            if !loop_internal(x, y) {
-                break;
-            }
-        }
-
-        for y in (y + 1)..8 {
-            if !loop_internal(x, y) {
-                break;
-            }
-        }
-
-        for y in y..0 {
-            if !loop_internal(x, y) {
-                break;
-            }
-        }
-
-        return count;
-    }
-
-    fn add_knight_moves(&self, buffer: &mut Vec<Move>, piece: TaggedPiece, x: u8, y: u8) -> usize {
-        let color = piece.get_color();
-        let from = Pos::from_xy(x, y);
-
-        let mut count = 0;
-        let mut add_move = |m| {
-            buffer.push(m);
-            count += 1;
-        };
-
-        let mut add_move_move = |x_dir: i8, y_dir: i8| {
-            let to_x = x as i8 + x_dir;
-            let to_y = y as i8 + y_dir * 2;
-            if (0..8).contains(&to_x) && (0..8).contains(&to_y) {
-                let to_x = to_x as u8;
-                let to_y = to_y as u8;
-                let space = self.data[(to_y * 8 + to_x) as usize];
-                if space.is_empty() || space.get_color() != color {
-                    add_move(Move::Move(from, Pos::from_xy(to_x, to_y)));
+        if r#loop {
+            let mut add_moves = |dir: &(i8, i8)| {
+                let mut i: i8 = 1;
+                loop {
+                    let new_dir = (dir.0 * i, dir.1 * i);
+                    if !add_move(&new_dir) {
+                        break;
+                    }
+                    i += 1;
                 }
             };
-        };
 
-        add_move_move(1, 1);
-        add_move_move(1, -1);
-        add_move_move(-1, -1);
-        add_move_move(-1, 1);
+            for d in directions.iter() {
+                add_moves(d);
+            }
+        } else {
+            for d in directions.iter() {
+                add_move(d);
+            }
+        }
+    }
 
+    fn add_castling_moves(&self, buffer: &mut MoveArray) {
         let empty_at = |x, y| {
             return self.at(x, y).is_empty();
         };
 
         let mut add_castling_move = |y| {
             if self.at(0, y).is_original() && empty_at(1, y) && empty_at(2, y) && empty_at(3, y) {
-                add_move(Move::QueenSideCastling);
+                buffer.push(Move::QueenSideCastling);
             }
 
             if self.at(7, y).is_original() && empty_at(5, y) && empty_at(6, y) {
-                add_move(Move::KingSideCastling);
+                buffer.push(Move::KingSideCastling);
             }
         };
 
-        if color == Color::White {
+        if self.color == Color::White {
             add_castling_move(0);
         } else {
             add_castling_move(7);
         }
-
-        return count;
-    }
-
-    fn add_bishop_moves(&self, buffer: &mut Vec<Move>, color: Color, x: u8, y: u8) -> usize {
-        use std::cmp::min;
-
-        let from = Pos::from_xy(x, y);
-        let mut count = 0;
-        let mut check = |x_dir: i8, y_dir: i8, dist: u8| {
-            for off in 1..dist {
-                let x = (x as i8 + (off as i8 * x_dir as i8)) as u8;
-                let y = (y as i8 + (off as i8 * y_dir as i8)) as u8;
-                let piece = self.at(x, y);
-
-                if piece.is_empty() || piece.get_color() != color {
-                    buffer.push(Move::Move(from, Pos::from_xy(x, y)));
-                    count += 1;
-                }
-
-                if !piece.is_empty() {
-                    break;
-                }
-            }
-        };
-
-        // NW
-        check(-1, -1, min(x, y));
-
-        // NE
-        check(1, -1, min(8 - x, y));
-
-        // SE
-        check(1, 1, min(8 - x, 8 - y));
-
-        // SW
-        check(-1, 1, min(x, 8 - y));
-
-        return count;
-    }
-
-    fn add_king_moves(&self, buffer: &mut Vec<Move>, color: Color, x: u8, y: u8) -> usize {
-        let mut count = 0;
-
-        let mut check = |x_dir: i8, y_dir: i8| {
-            let to_x = x as i8 + x_dir;
-            let to_y = y as i8 + y_dir;
-            if (0..8).contains(&to_x) && (0..8).contains(&to_y) {
-                let piece = self.at(to_x as u8, to_y as u8);
-
-                if piece.is_empty() || piece.get_color() != color {
-                    buffer.push(Move::Move(
-                        Pos::from_xy(x, y),
-                        Pos::from_xy(to_x as u8, to_y as u8),
-                    ));
-                    count += 1;
-                }
-            }
-        };
-
-        check(1, 1);
-        check(-1, 1);
-        check(-1, -1);
-        check(1, -1);
-
-        return count;
     }
 
     pub fn print_ascii(&self) {

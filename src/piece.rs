@@ -18,6 +18,14 @@ pub enum Color {
     Black = 128,
 }
 
+impl Color {
+    pub fn flip(&mut self) {
+        unsafe {
+            *self = std::mem::transmute((*self as u8) ^ 128);
+        }
+    }
+}
+
 #[derive(Copy, Clone, PartialEq)]
 pub struct TaggedPiece(u8);
 

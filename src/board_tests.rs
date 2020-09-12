@@ -44,99 +44,93 @@ fn new_board() {
 
 #[test]
 fn pawn_moves_new_board() {
-    let board = Board::new();
+    let mut board = Board::new();
 
-    let mut moves = Vec::<Move>::with_capacity(10);
     for x in 0..8 {
-        // Top of board
-        let mut check_side = |y_start, y_dir: i8| {
-            let move_to = |to_x, to_y| {
+        let check_side = |board: &mut Board, y_start, y_dir: i8| {
+            let move_to = |to_y| {
                 let from = Pos::from_xy(x, y_start);
-                let to = Pos::from_xy(to_x, to_y);
+                let to = Pos::from_xy(x, to_y);
                 Move::Move(from, to)
             };
 
-            let correct_moves = [
-                move_to(x, (y_start as i8 + y_dir) as u8),
-                move_to(x, (y_start as i8 + y_dir * 2) as u8),
-            ];
+            let correct_moves = MoveArray::from_slice(&[
+                move_to((y_start as i8 + y_dir) as u8),
+                move_to((y_start as i8 + y_dir * 2) as u8),
+            ]);
 
-            let count = board.get_moves_for(&mut moves, x, y_start).unwrap();
-            assert_eq!(count, correct_moves.len());
-
-            for (i, m) in moves.iter().enumerate() {
-                assert_eq!(m, &correct_moves[i]);
-            }
-
-            moves.clear();
+            assert_eq!(board.get_moves_for(x, y_start).unwrap(), &correct_moves);
         };
 
-        check_side(1, 1);
-        check_side(6, -1);
+        check_side(&mut board, 1, 1);
+        board.flip_color();
+        check_side(&mut board, 6, -1);
+        board.flip_color();
     }
 }
 
 #[test]
 fn rook_moves_new_board() {
-    let board = Board::new();
+    let mut board = Board::new();
 
-    let mut moves = Vec::<Move>::new();
-    assert_eq!(board.get_moves_for(&mut moves, 0, 0).unwrap(), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 7, 0).unwrap(), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 0, 7).unwrap(), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 7, 7).unwrap(), 0);
+    assert!(board.get_moves_for(0, 0).unwrap().is_empty());
+    assert!(board.get_moves_for(7, 0).unwrap().is_empty());
+
+    board.flip_color();
+    assert!(board.get_moves_for(0, 7).unwrap().is_empty());
+    assert!(board.get_moves_for(7, 7).unwrap().is_empty());
 }
 
 #[test]
 fn knight_moves_new_board() {
-    let board = Board::new();
-    let mut moves = Vec::<Move>::with_capacity(2);
+    let mut board = Board::new();
 
-    let mut check = |x, y, end_y| {
+    let check = |board: &mut Board, x, y, end_y| {
         let from = Pos::from_xy(x, y);
-        let correct_moves = [
+        let correct_moves = MoveArray::from_slice(&[
             Move::Move(from, Pos::from_xy(x + 1, end_y)),
             Move::Move(from, Pos::from_xy(x - 1, end_y)),
-        ];
+        ]);
 
-        assert_eq!(board.get_moves_for(&mut moves, x, y).unwrap(), 2);
-        for (i, m) in moves.iter().enumerate() {
-            assert_eq!(m, &correct_moves[i]);
-        }
-        moves.clear();
+        assert_eq!(board.get_moves_for(x, y).unwrap(), &correct_moves);
     };
 
-    check(1, 0, 2);
-    check(6, 0, 2);
-    check(1, 7, 5);
-    check(6, 7, 5);
+    check(&mut board, 1, 0, 2);
+    check(&mut board, 6, 0, 2);
+
+    board.flip_color();
+    check(&mut board, 1, 7, 5);
+    check(&mut board, 6, 7, 5);
 }
 
 #[test]
 fn bishop_moves_new_board() {
-    let board = Board::new();
+    let mut board = Board::new();
 
-    let mut moves = Vec::<Move>::new();
-    assert_eq!(board.get_moves_for(&mut moves, 2, 0).unwrap(), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 5, 0).unwrap(), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 2, 7).unwrap(), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 5, 7).unwrap(), 0);
+    assert!(board.get_moves_for(2, 0).unwrap().is_empty());
+    assert!(board.get_moves_for(5, 0).unwrap().is_empty());
+
+    board.flip_color();
+    assert!(board.get_moves_for(2, 7).unwrap().is_empty());
+    assert!(board.get_moves_for(5, 7).unwrap().is_empty());
 }
 
 #[test]
 fn queen_moves_new_board() {
-    let board = Board::new();
+    let mut board = Board::new();
 
-    let mut moves = Vec::<Move>::new();
-    assert_eq!(board.get_moves_for(&mut moves, 3, 0).unwrap(), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 3, 7).unwrap(), 0);
+    assert!(board.get_moves_for(3, 0).unwrap().is_empty());
+
+    board.flip_color();
+    assert!(board.get_moves_for(3, 7).unwrap().is_empty());
 }
 
 #[test]
 fn king_moves_new_board() {
-    let board = Board::new();
+    let mut board = Board::new();
 
-    let mut moves = Vec::<Move>::new();
-    assert_eq!(board.get_moves_for(&mut moves, 4, 0).unwrap(), 0);
-    assert_eq!(board.get_moves_for(&mut moves, 4, 7).unwrap(), 0);
+    assert!(board.get_moves_for(4, 0).unwrap().is_empty());
+
+    board.flip_color();
+    assert!(board.get_moves_for(4, 7).unwrap().is_empty());
 }
