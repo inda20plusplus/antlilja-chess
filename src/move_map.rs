@@ -15,7 +15,7 @@ impl PartialEq for MoveArray {
         }
 
         for i in 0..self.size() {
-            if !self.data.contains(other.at(i)) {
+            if !self.data.contains(&other.at(i)) {
                 return false;
             }
         }
@@ -60,6 +60,10 @@ impl MoveArray {
 
     pub fn size(&self) -> usize {
         return (self.size_uninit & 127) as usize;
+    }
+
+    pub fn at(&self, index: usize) -> Move {
+        return self.data[index];
     }
 
     pub fn find(&self, r#move: Move) -> Option<usize> {
