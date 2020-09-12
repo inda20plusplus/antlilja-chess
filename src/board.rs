@@ -59,6 +59,21 @@ impl Board {
         return true;
     }
 
+    pub fn find_first_of_type(&self, r#type: PieceType, color: Color) -> Option<Pos> {
+        let piece = TaggedPiece::new(r#type, color);
+        for (i, p) in self.0.iter().enumerate() {
+            if p == &piece {
+                return Some(Pos::from_index(i as u8));
+            }
+        }
+
+        return None;
+    }
+
+    pub fn find_king(&self, color: Color) -> Pos {
+        return self.find_first_of_type(PieceType::King, color).unwrap();
+    }
+
     pub fn print_ascii(&self, color: Color) {
         let internal_loop = |y| {
             print!("| ");
