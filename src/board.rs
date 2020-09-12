@@ -1,5 +1,6 @@
 use crate::{Color, PieceType, Pos, TaggedPiece};
 
+#[derive(Copy, Clone)]
 pub struct Board([TaggedPiece; 64]);
 
 impl Board {
