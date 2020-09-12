@@ -4,8 +4,8 @@ use crate::{PieceType, Pos};
 #[repr(u8)]
 pub enum Move {
     None,
-    Move(Pos, Pos),
-    PawnPromotion(PieceType, Pos, Pos),
+    Move(Pos),
+    PawnPromotion(PieceType, Pos),
     KingSideCastling,
     QueenSideCastling,
 }

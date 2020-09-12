@@ -16,24 +16,34 @@ pub struct Game {
 
 impl Game {
     pub fn new() -> Self {
-        return Game {
+        let mut game = Game {
             board: Board::new(),
             move_map: MoveMap::new(),
             history: Vec::<Move>::with_capacity(50),
             color: Color::White,
         };
+
+        game.calculate_all_moves();
+
+        return game;
     }
 
-    pub fn flip_color(&mut self) {
+    pub fn switch_side(&mut self) {
+        self.move_map.clear();
         self.color.flip();
+        self.calculate_all_moves();
     }
 
-    pub fn play(&mut self, x: u8, y: u8, index: usize) -> bool {
+    pub fn current_color(&self) -> Color {
+        return self.color;
+    }
+
+    pub fn play(&mut self, x: u8, y: u8, index: usize) -> Result {
         let pos = Pos::from_xy(x, y);
 
-        if pos.as_index() >= 64 || self.at_pos(pos).is_empty() {
-            return false;
-        }
+        assert!(pos.as_index() < 64);
+        assert!(!self.at_pos(pos).is_empty());
+
         let moves: &MoveArray = if self.move_map.at(pos).is_empty() {
             self.get_moves_for(x, y);
             &self.move_map.at(pos)
@@ -41,26 +51,26 @@ impl Game {
             &self.move_map.at(pos)
         };
 
-        if index >= moves.size() {
-            return false;
-        }
+        assert!(index < moves.size());
 
         let r#move = moves.at(index);
 
-        match r#move {
-            Move::Move(from, to) => {
-                self.board.set_pos(*to, self.board.at_pos(*from));
-                self.board.set_pos(*from, TaggedPiece::empty());
-            }
-            _ => {
-                return false;
-            }
-        }
+        self.board = self.board.board_after_move(pos, r#move, self.color);
 
-        self.history.push(*r#move);
+        self.history.push(r#move);
         self.move_map.clear();
         self.color.flip();
-        return true;
+        if self.calculate_all_moves() {
+            let pos = self.board.find_king(self.color);
+            let xy = pos.to_xy();
+            if self.board.pos_in_danger(xy.0, xy.1, self.color) {
+                return Result::Checkmate;
+            } else {
+                return Result::Stalemate;
+            }
+        } else {
+            return Result::Ok;
+        }
     }
 
     pub fn at_xy(&self, x: u8, y: u8) -> TaggedPiece {
@@ -75,16 +85,25 @@ impl Game {
         return self.board.at_index(i);
     }
 
-    pub fn get_moves_for(&mut self, x: u8, y: u8) -> Option<&MoveArray> {
-        let pos = Pos::from_xy(x, y);
-        if !self.move_map.at(pos).is_empty() {
-            return Some(&self.move_map.at(pos));
+    fn calculate_all_moves(&mut self) -> bool {
+        let mut checkmate = true;
+        for y in 0..8 {
+            for x in 0..8 {
+                if self.calculate_moves_for(x, y) > 0 {
+                    checkmate = false;
+                }
+            }
         }
 
+        return checkmate;
+    }
+
+    fn calculate_moves_for(&mut self, x: u8, y: u8) -> usize {
+        let pos = Pos::from_xy(x, y);
         let piece = self.at_pos(pos);
 
         if piece.get_color() != self.color {
-            return None;
+            return 0;
         }
 
         let mut moves = MoveArray::empty();
@@ -114,31 +133,45 @@ impl Game {
                 self.add_direction_moves(&mut moves, x, y, (0, 1), false);
                 self.add_castling_moves(&mut moves);
             }
-            _ => return None,
+            _ => {
+                return 0;
+            }
         };
 
-        return Some(self.move_map.insert(pos, moves));
+        self.move_map.insert(pos, moves);
+        return moves.size();
+    }
+
+    pub fn get_moves_for(&self, x: u8, y: u8) -> Option<&MoveArray> {
+        let pos = Pos::from_xy(x, y);
+
+        if self.at_pos(pos).is_empty() {
+            return None;
+        }
+
+        return Some(&self.move_map.at(pos));
     }
 
     fn add_pawn_moves(&self, buffer: &mut MoveArray, x: u8, y: u8) {
-        let from = Pos::from_xy(x, y);
-
-        let mut add_pawn_move = |to| {
-            buffer.push(Move::Move(from, to));
-        };
-
         let dir: i8 = if self.color == Color::White { 1 } else { -1 };
 
         let y_forward = (y as i8 + dir) as u8;
         if self.at_xy(x, y_forward).is_empty() {
-            add_pawn_move(Pos::from_xy(x, y_forward));
-
+            let to = Pos::from_xy(x, y_forward);
+            if y_forward == 0 || y_forward == 7 {
+                buffer.push(Move::PawnPromotion(PieceType::Queen, to))
+            } else {
+                buffer.push(Move::Move(to));
+            }
             let y_off = y as i8 + dir * 2;
             if (0..8).contains(&y_off) {
                 let y_off = y_off as u8;
 
-                if (y == 1 || y == 6) && self.at_xy(x, y_off).is_empty() {
-                    add_pawn_move(Pos::from_xy(x, y_off));
+                if ((y == 1 && self.color == Color::White)
+                    || (y == 6 && self.color == Color::Black))
+                    && self.at_xy(x, y_off).is_empty()
+                {
+                    buffer.push(Move::Move(Pos::from_xy(x, y_off)));
                 }
             }
         }
@@ -146,7 +179,7 @@ impl Game {
         let mut add_pawn_take = |x: u8, y: u8| {
             let space = self.at_xy(x, y);
             if !space.is_empty() && space.get_color() != self.color {
-                add_pawn_move(Pos::from_xy(x, y));
+                buffer.push(Move::Move(Pos::from_xy(x, y)));
             }
         };
 
@@ -183,7 +216,14 @@ impl Game {
             let piece = self.at_xy(x, y);
 
             if piece.is_empty() || piece.get_color() != self.color {
-                buffer.push(Move::Move(from, Pos::from_xy(x, y)));
+                let r#move = Move::Move(Pos::from_xy(x, y));
+
+                let board_with_move = self.board.board_after_move(from, r#move, self.color);
+                let king_pos = board_with_move.find_king(self.color);
+                let xy = king_pos.to_xy();
+                if !board_with_move.pos_in_danger(xy.0, xy.1, self.color) {
+                    buffer.push(r#move);
+                }
             }
 
             return piece.is_empty();
@@ -218,21 +258,34 @@ impl Game {
             return self.at_xy(x, y).is_empty();
         };
 
-        let mut add_castling_move = |y| {
-            if self.at_xy(0, y).is_original() && empty_at(1, y) && empty_at(2, y) && empty_at(3, y)
+        let mut add_move = |y| {
+            let r#move = if self.at_xy(0, y).is_original()
+                && empty_at(1, y)
+                && empty_at(2, y)
+                && empty_at(3, y)
             {
-                buffer.push(Move::QueenSideCastling);
-            }
+                Move::QueenSideCastling
+            } else if self.at_xy(7, y).is_original() && empty_at(5, y) && empty_at(6, y) {
+                Move::KingSideCastling
+            } else {
+                Move::None
+            };
 
-            if self.at_xy(7, y).is_original() && empty_at(5, y) && empty_at(6, y) {
-                buffer.push(Move::KingSideCastling);
+            if r#move != Move::None {
+                let king_pos = Pos::from_xy(4, y);
+                let board_with_move = self.board.board_after_move(king_pos, r#move, self.color);
+                let king_pos = board_with_move.find_king(self.color);
+                let xy = king_pos.to_xy();
+                if !board_with_move.pos_in_danger(xy.0, xy.1, self.color) {
+                    buffer.push(r#move);
+                }
             }
         };
 
         if self.color == Color::White {
-            add_castling_move(0);
+            add_move(0);
         } else {
-            add_castling_move(7);
+            add_move(7);
         }
     }
 

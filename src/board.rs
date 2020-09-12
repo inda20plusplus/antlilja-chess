@@ -1,4 +1,4 @@
-use crate::{Color, PieceType, Pos, TaggedPiece};
+use crate::{Color, Move, PieceType, Pos, TaggedPiece};
 
 #[derive(Copy, Clone)]
 pub struct Board([TaggedPiece; 64]);
@@ -72,6 +72,40 @@ impl Board {
 
     pub fn find_king(&self, color: Color) -> Pos {
         return self.find_first_of_type(PieceType::King, color).unwrap();
+    }
+
+    pub fn board_after_move(&self, from: Pos, r#move: Move, color: Color) -> Self {
+        let mut board = *self;
+        match r#move {
+            Move::Move(to) => {
+                board.move_piece(from, to);
+            }
+            Move::KingSideCastling => {
+                let y: u8 = if color == Color::White { 0 } else { 7 };
+
+                let rook_pos = Pos::from_xy(7, y);
+                board.move_piece(rook_pos, Pos::from_xy(5, y));
+
+                let king_pos = Pos::from_xy(4, y);
+                board.move_piece(king_pos, Pos::from_xy(6, y));
+            }
+            Move::QueenSideCastling => {
+                let y: u8 = if color == Color::White { 0 } else { 7 };
+
+                let rook_pos = Pos::from_xy(0, y);
+                board.move_piece(rook_pos, Pos::from_xy(3, y));
+
+                let king_pos = Pos::from_xy(4, y);
+                board.move_piece(king_pos, Pos::from_xy(2, y));
+            }
+            Move::PawnPromotion(r#type, to) => {
+                board.move_piece(from, to);
+                board.set_pos(to, TaggedPiece::new(r#type, color));
+            }
+            _ => {}
+        }
+
+        return board;
     }
 
     pub fn pos_in_danger(&self, x: u8, y: u8, color: Color) -> bool {
