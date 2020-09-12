@@ -209,7 +209,7 @@ impl Board {
 
     pub fn print_ascii(&self, color: Color) {
         let internal_loop = |y| {
-            print!("| ");
+            print!("{}| ", y + 1);
             for x in 0..8 {
                 print!("{:?} ", self.at_xy(x, y));
             }
@@ -225,5 +225,7 @@ impl Board {
                 internal_loop(y);
             }
         }
+        println!("   - - - - - - - -");
+        println!("   a b c d e f g h");
     }
 }
