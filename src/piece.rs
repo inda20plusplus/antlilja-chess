@@ -26,8 +26,14 @@ impl Color {
     }
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone)]
 pub struct TaggedPiece(u8);
+
+impl PartialEq for TaggedPiece {
+    fn eq(&self, other: &Self) -> bool {
+        return (self.0 & 191) == (other.0 & 191);
+    }
+}
 
 impl TaggedPiece {
     pub fn empty() -> Self {
