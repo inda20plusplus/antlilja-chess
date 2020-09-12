@@ -74,6 +74,105 @@ impl Board {
         return self.find_first_of_type(PieceType::King, color).unwrap();
     }
 
+    pub fn pos_in_danger(&self, x: u8, y: u8, color: Color) -> bool {
+        let first_enemy_piece = |dir_x: i8, dir_y: i8| {
+            let mut i: i8 = 1;
+            loop {
+                let new_x = x as i8 + dir_x * i;
+                let new_y = y as i8 + dir_y * i;
+
+                if !(0..8).contains(&new_x) || !(0..8).contains(&new_y) {
+                    return None;
+                }
+
+                let pos = Pos::from_xy(new_x as u8, new_y as u8);
+                let piece = self.at_pos(pos);
+
+                if !piece.is_empty() {
+                    if piece.get_color() == color {
+                        return None;
+                    } else {
+                        return Some((new_x as u8, new_y as u8));
+                    }
+                }
+
+                i += 1;
+            }
+        };
+
+        let diag = |config: &(i8, i8, Color)| {
+            let xy = first_enemy_piece(config.0, config.1);
+            if xy.is_some() {
+                let xy = xy.unwrap();
+                let pos = Pos::from_xy(xy.0, xy.1);
+                let piece = self.at_pos(pos);
+                let ptype = piece.get_type();
+                if ptype == PieceType::Bishop || ptype == PieceType::Queen {
+                    return true;
+                }
+
+                use std::cmp::{max, min};
+
+                let dist_x = max(x, xy.0) - min(x, xy.0);
+                let dist_y = max(y, xy.1) - min(y, xy.1);
+                if dist_x == 1
+                    && dist_y == 1
+                    && (ptype == PieceType::King || (color == config.2 && ptype == PieceType::Pawn))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        let dirs: [(i8, i8, Color); 4] = [
+            (1, 1, Color::White),
+            (-1, 1, Color::White),
+            (1, -1, Color::Black),
+            (-1, -1, Color::Black),
+        ];
+
+        for d in dirs.iter() {
+            if diag(d) {
+                return true;
+            }
+        }
+
+        let straight = |dir: &(i8, i8)| {
+            let xy = first_enemy_piece(dir.0, dir.1);
+            if xy.is_some() {
+                let xy = xy.unwrap();
+                let pos = Pos::from_xy(xy.0, xy.1);
+                let piece = self.at_pos(pos);
+                let ptype = piece.get_type();
+
+                if ptype == PieceType::Rook || ptype == PieceType::Queen {
+                    return true;
+                }
+
+                use std::cmp::{max, min};
+
+                let dist_x = max(x, xy.0) - min(x, xy.0);
+                let dist_y = max(y, xy.1) - min(y, xy.1);
+                if dist_x == 1 && dist_y == 1 && ptype == PieceType::King {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        let dirs: [(i8, i8); 4] = [(1, 0), (0, 1), (-1, 0), (0, -1)];
+
+        for d in dirs.iter() {
+            if straight(d) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     pub fn print_ascii(&self, color: Color) {
         let internal_loop = |y| {
             print!("| ");
