@@ -62,8 +62,14 @@ impl MoveArray {
         return (self.size_uninit & 127) as usize;
     }
 
-    pub fn at(&self, index: usize) -> &Move {
-        return &self.data[index];
+    pub fn find(&self, r#move: Move) -> Option<usize> {
+        for (i, m) in self.data.iter().enumerate() {
+            if &r#move == m {
+                return Some(i);
+            }
+        }
+
+        return None;
     }
 
     pub fn push(&mut self, r#move: Move) {
