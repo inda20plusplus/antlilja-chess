@@ -1,5 +1,4 @@
-use crate::piece::PieceType;
-use crate::pos::Pos;
+use crate::{PieceType, Pos};
 
 #[derive(Copy, Clone, PartialEq, Debug)]
 #[repr(u8)]

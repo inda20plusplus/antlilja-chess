@@ -1,5 +1,4 @@
-use crate::Move;
-use crate::Pos;
+use crate::{Move, Pos};
 
 const MOVE_ARRAY_SIZE: usize = 28;
 
