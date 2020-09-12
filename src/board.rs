@@ -54,7 +54,8 @@ impl Board {
             return false;
         }
 
-        self.set_pos(to, self.at_pos(from));
+        self.set_pos(to, self.at_pos(from).non_original());
+        self.set_pos(from, TaggedPiece::empty());
         return true;
     }
 
