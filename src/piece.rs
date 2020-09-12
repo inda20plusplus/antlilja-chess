@@ -52,6 +52,10 @@ impl TaggedPiece {
         };
     }
 
+    pub fn non_original(&self) -> Self {
+        return TaggedPiece { 0: self.0 & 191 };
+    }
+
     pub fn is_empty(&self) -> bool {
         return self.0 == 0;
     }
