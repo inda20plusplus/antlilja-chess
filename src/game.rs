@@ -131,6 +131,7 @@ impl Game {
             PieceType::King => {
                 self.add_direction_moves(&mut moves, x, y, (1, 0), false);
                 self.add_direction_moves(&mut moves, x, y, (0, 1), false);
+                self.add_direction_moves(&mut moves, x, y, (1, 1), false);
                 self.add_castling_moves(&mut moves);
             }
             _ => {
