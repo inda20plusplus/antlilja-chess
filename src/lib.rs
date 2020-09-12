@@ -9,7 +9,7 @@ pub mod pos;
 mod board_tests;
 
 pub use board::Board;
-pub use game::Game;
+pub use game::{Game, Result};
 pub use move_map::{MoveArray, MoveMap};
 pub use piece::{Color, PieceType, TaggedPiece};
 pub use pos::Pos;

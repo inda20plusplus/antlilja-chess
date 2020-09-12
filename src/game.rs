@@ -1,5 +1,12 @@
 use crate::{Board, Color, Move, MoveArray, MoveMap, PieceType, Pos, TaggedPiece};
 
+#[derive(PartialEq)]
+pub enum Result {
+    Ok,
+    Checkmate,
+    Stalemate,
+}
+
 pub struct Game {
     board: Board,
     move_map: MoveMap,
