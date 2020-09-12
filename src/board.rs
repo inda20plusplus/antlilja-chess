@@ -57,13 +57,23 @@ impl Board {
         return true;
     }
 
-    pub fn print_ascii(&self) {
-        for y in (0..8).rev() {
+    pub fn print_ascii(&self, color: Color) {
+        let internal_loop = |y| {
             print!("| ");
             for x in 0..8 {
                 print!("{:?} ", self.at_xy(x, y));
             }
-            println!("|")
+            println!("|");
+        };
+
+        if color == Color::White {
+            for y in (0..8).rev() {
+                internal_loop(y);
+            }
+        } else {
+            for y in 0..8 {
+                internal_loop(y);
+            }
         }
     }
 }

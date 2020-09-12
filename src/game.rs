@@ -230,6 +230,6 @@ impl Game {
     }
 
     pub fn print_ascii(&self) {
-        self.board.print_ascii();
+        self.board.print_ascii(self.color);
     }
 }
