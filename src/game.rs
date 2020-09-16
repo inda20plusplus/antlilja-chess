@@ -28,10 +28,10 @@ impl Game {
         return game;
     }
 
-    pub fn switch_side(&mut self) {
+    pub fn switch_side(&mut self) -> bool {
         self.move_map.clear();
         self.color.flip();
-        self.calculate_all_moves();
+        return self.calculate_all_moves();
     }
 
     pub fn current_color(&self) -> Color {
@@ -58,9 +58,7 @@ impl Game {
         self.board = self.board.board_after_move(pos, r#move, self.color);
 
         self.history.push(r#move);
-        self.move_map.clear();
-        self.color.flip();
-        if self.calculate_all_moves() {
+        if self.switch_side() {
             let pos = self.board.find_king(self.color);
             let xy = pos.to_xy();
             if self.board.pos_in_danger(xy.0, xy.1, self.color) {
