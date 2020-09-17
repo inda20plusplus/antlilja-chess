@@ -257,35 +257,25 @@ impl Game {
             return self.at_xy(x, y).is_empty();
         };
 
-        let mut add_move = |y| {
-            let r#move = if self.at_xy(0, y).is_original()
-                && empty_at(1, y)
-                && empty_at(2, y)
-                && empty_at(3, y)
+        let y = if self.color == Color::White { 0 } else { 7 };
+
+        let (r#move, king_x) =
+            if self.at_xy(0, y).is_original() && empty_at(1, y) && empty_at(2, y) && empty_at(3, y)
             {
-                Move::QueenSideCastling
+                (Move::QueenSideCastling, 3)
             } else if self.at_xy(7, y).is_original() && empty_at(5, y) && empty_at(6, y) {
-                Move::KingSideCastling
+                (Move::KingSideCastling, 6)
             } else {
-                Move::None
+                (Move::None, 0)
             };
 
             if r#move != Move::None {
                 let king_pos = Pos::from_xy(4, y);
                 let board_with_move = self.board.board_after_move(king_pos, r#move, self.color);
-                let king_pos = board_with_move.find_king(self.color);
-                let xy = king_pos.to_xy();
-                if !board_with_move.pos_in_danger(xy.0, xy.1, self.color) {
+            if !board_with_move.pos_in_danger(king_x, y, self.color) {
                     buffer.push(r#move);
                 }
             }
-        };
-
-        if self.color == Color::White {
-            add_move(0);
-        } else {
-            add_move(7);
-        }
     }
 
     pub fn print_ascii(&self) {
