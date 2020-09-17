@@ -56,11 +56,26 @@ mod inner {
 
             let mut add_pawn_take = |x: u8, y: u8| {
                 let space = self.at_xy(x, y);
-                if !space.is_empty() && space.get_color() != self.color {
-                    let r#move = Move::move_xy(x, y);
-                    if is_safe_move(r#move) {
-                        buffer.push(r#move);
+
+                // En passant
+                let last = self.history.last();
+                let r#move = if last.is_some() {
+                    let (from_x, from_y) = last.unwrap().0.to_xy();
+                    if from_x != x && y != (from_y as i8 + (dir * -1)) as u8 {
+                        Move::EnPassant(Pos::from_xy(x, y))
+                    } else {
+                        Move::None
                     }
+                }
+                // Standard diagonal pawn take
+                else if !space.is_empty() && space.get_color() != self.color {
+                    Move::move_xy(x, y)
+                } else {
+                    Move::None
+                };
+
+                if r#move != Move::None && is_safe_move(r#move) {
+                    buffer.push(r#move);
                 }
             };
 

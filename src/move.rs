@@ -5,6 +5,7 @@ use crate::{PieceType, Pos};
 pub enum Move {
     None,
     Move(Pos),
+    EnPassant(Pos),
     PawnPromotion(PieceType, Pos),
     KingSideCastling,
     QueenSideCastling,
