@@ -190,15 +190,10 @@ impl Game {
                 }
             }
 
+            if (y == 1 && self.color == Color::White) || (y == 6 && self.color == Color::Black) {
             let y_off = y as i8 + dir * 2;
-            if (0..8).contains(&y_off) {
-                let y_off = y_off as u8;
-
-                if ((y == 1 && self.color == Color::White)
-                    || (y == 6 && self.color == Color::Black))
-                    && self.at_xy(x, y_off).is_empty()
-                {
-                    let r#move = Move::Move(Pos::from_xy(x, y_off));
+                if (0..8).contains(&y_off) && self.at_xy(x, y_off as u8).is_empty() {
+                    let r#move = Move::Move(Pos::from_xy(x, y_off as u8));
                     if is_safe_move(r#move) {
                         buffer.push(r#move);
                     }
