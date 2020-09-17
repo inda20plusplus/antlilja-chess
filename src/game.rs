@@ -169,6 +169,8 @@ impl Game {
         let y_forward = (y as i8 + dir) as u8;
         if self.at_xy(x, y_forward).is_empty() {
             let to = Pos::from_xy(x, y_forward);
+
+            // Promotion
             if y_forward == 0 || y_forward == 7 {
                 let r#move = Move::PawnPromotion(PieceType::Queen, to);
 
@@ -183,15 +185,18 @@ impl Game {
                 if !board_after_move.pos_in_danger(self.king_pos.0, self.king_pos.1, self.color) {
                     buffer.push(r#move);
                 }
-            } else {
+            }
+            // Standard forward
+            else {
                 let r#move = Move::Move(to);
                 if is_safe_move(r#move) {
                     buffer.push(r#move);
                 }
             }
 
+            // First move, double forward
             if (y == 1 && self.color == Color::White) || (y == 6 && self.color == Color::Black) {
-            let y_off = y as i8 + dir * 2;
+                let y_off = y as i8 + dir * 2;
                 if (0..8).contains(&y_off) && self.at_xy(x, y_off as u8).is_empty() {
                     let r#move = Move::Move(Pos::from_xy(x, y_off as u8));
                     if is_safe_move(r#move) {
