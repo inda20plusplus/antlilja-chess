@@ -1,12 +1,14 @@
 use crate::{Board, Color, Move, MoveArray, MoveMap, PieceType, Pos, TaggedPiece};
 
 mod moves;
+mod pgn;
 
 #[cfg(test)]
 mod tests;
 
 #[derive(PartialEq)]
 pub enum Result {
+    InvalidMove,
     Ok,
     Checkmate,
     Stalemate,
@@ -51,7 +53,7 @@ impl Game {
         return board_after_move.pos_in_danger(self.king_pos.0, self.king_pos.1, self.color);
     }
 
-    pub fn play(&mut self, x: u8, y: u8, index: usize) -> Result {
+    pub fn play(&mut self, x: u8, y: u8, r#move: Move) -> Result {
         let pos = Pos::from_xy(x, y);
 
         assert!(pos.as_index() < 64);
@@ -64,9 +66,9 @@ impl Game {
             &self.move_map.at(pos)
         };
 
-        assert!(index < moves.size());
-
-        let r#move = moves.at(index);
+        if !moves.exists(r#move) {
+            return Result::InvalidMove;
+        }
 
         self.board = self.board.board_after_move(pos, r#move, self.color);
 

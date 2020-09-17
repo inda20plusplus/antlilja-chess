@@ -28,6 +28,7 @@ fn main() {
     let mut buffer = String::new();
 
     loop {
+        print!("\x1B[2J\x1B[1;1H");
         buffer.clear();
         game.print_ascii();
         println!("Make your move: ");
@@ -35,37 +36,33 @@ fn main() {
         let r#move = parse_move(&buffer);
 
         if r#move.is_none() {
-            println!("Not a valid move: {}", buffer);
             continue;
         }
 
-        let r#move = r#move.unwrap();
-        let from = r#move.0;
-        let to = r#move.1;
+        let ((x, y), (to_x, to_y)) = r#move.unwrap();
 
-        let moves = game.get_moves_for(from.0, from.1);
+        let moves = game.get_moves_for(x, y);
 
         if moves.is_none() {
-            println!("Not a valid move: {}", buffer);
             continue;
         }
 
-        let r#move = Move::move_xy(to.0, to.1);
+        let r#move = Move::move_xy(to_x, to_y);
 
-        let moves = moves.unwrap();
-
-        let move_index = moves.find(r#move);
-
-        if move_index.is_none() {
-            println!("Not a valid move: {}", buffer);
-            continue;
-        }
-
-        let move_index = move_index.unwrap();
-
-        if game.play(from.0, from.1, move_index) == Result::Checkmate {
-            println!("{:?} lost :(", game.current_color());
-            break;
+        let result = game.play(x, y, r#move);
+        match result {
+            Result::InvalidMove => {
+                continue;
+            }
+            Result::Checkmate => {
+                println!("{:?} lost :(", game.current_color());
+                break;
+            }
+            Result::Stalemate => {
+                println!("Stalemate!");
+                break;
+            }
+            _ => {}
         }
     }
 }

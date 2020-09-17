@@ -66,6 +66,15 @@ impl MoveArray {
         return self.data[index];
     }
 
+    pub fn exists(&self, r#move: Move) -> bool {
+        for m in self.data.iter() {
+            if &r#move == m {
+                return true;
+            }
+        }
+        return false;
+    }
+
     pub fn find(&self, r#move: Move) -> Option<usize> {
         for (i, m) in self.data.iter().enumerate() {
             if &r#move == m {
