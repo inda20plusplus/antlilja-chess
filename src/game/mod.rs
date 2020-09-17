@@ -6,7 +6,7 @@ mod pgn;
 #[cfg(test)]
 mod tests;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub enum Result {
     InvalidMove,
     Ok,
