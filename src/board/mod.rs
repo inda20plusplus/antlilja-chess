@@ -1,5 +1,8 @@
 use crate::{Color, Move, PieceType, Pos, TaggedPiece};
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Copy, Clone)]
 pub struct Board([TaggedPiece; 64]);
 

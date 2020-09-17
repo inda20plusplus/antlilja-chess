@@ -5,12 +5,6 @@ pub mod move_map;
 pub mod piece;
 pub mod pos;
 
-#[cfg(test)]
-mod board_tests;
-
-#[cfg(test)]
-mod game_tests;
-
 pub use board::Board;
 pub use game::{Game, Result};
 pub use move_map::{MoveArray, MoveMap};
