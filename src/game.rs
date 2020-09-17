@@ -156,13 +156,21 @@ impl Game {
     fn add_pawn_moves(&self, buffer: &mut MoveArray, x: u8, y: u8) {
         let dir: i8 = if self.color == Color::White { 1 } else { -1 };
 
+        let from = Pos::from_xy(x, y);
+        let mut add_move = |r#move| {
+            let board_after_move = self.board.board_after_move(from, r#move, self.color);
+            if !board_after_move.pos_in_danger(self.king_pos.0, self.king_pos.1, self.color) {
+                buffer.push(r#move);
+            }
+        };
+
         let y_forward = (y as i8 + dir) as u8;
         if self.at_xy(x, y_forward).is_empty() {
             let to = Pos::from_xy(x, y_forward);
             if y_forward == 0 || y_forward == 7 {
-                buffer.push(Move::PawnPromotion(PieceType::Queen, to))
+                add_move(Move::PawnPromotion(PieceType::Queen, to));
             } else {
-                buffer.push(Move::Move(to));
+                add_move(Move::Move(to));
             }
             let y_off = y as i8 + dir * 2;
             if (0..8).contains(&y_off) {
@@ -172,7 +180,7 @@ impl Game {
                     || (y == 6 && self.color == Color::Black))
                     && self.at_xy(x, y_off).is_empty()
                 {
-                    buffer.push(Move::Move(Pos::from_xy(x, y_off)));
+                    add_move(Move::Move(Pos::from_xy(x, y_off)));
                 }
             }
         }
@@ -180,7 +188,7 @@ impl Game {
         let mut add_pawn_take = |x: u8, y: u8| {
             let space = self.at_xy(x, y);
             if !space.is_empty() && space.get_color() != self.color {
-                buffer.push(Move::Move(Pos::from_xy(x, y)));
+                add_move(Move::Move(Pos::from_xy(x, y)));
             }
         };
 
@@ -279,26 +287,26 @@ impl Game {
             && empty_and_not_in_check(1)
             && empty_and_not_in_check(2)
             && empty_and_not_in_check(3)
-            {
-                (Move::QueenSideCastling, 3)
+        {
+            (Move::QueenSideCastling, 3)
         } else if self.at_xy(7, y).is_original()
             && empty_and_not_in_check(5)
             && empty_and_not_in_check(6)
         {
-                (Move::KingSideCastling, 6)
-            } else {
-                (Move::None, 0)
-            };
+            (Move::KingSideCastling, 6)
+        } else {
+            (Move::None, 0)
+        };
 
         if r#move == Move::None {
             return;
         }
 
-                let board_with_move = self.board.board_after_move(king_pos, r#move, self.color);
-            if !board_with_move.pos_in_danger(king_x, y, self.color) {
-                    buffer.push(r#move);
-                }
-            }
+        let board_with_move = self.board.board_after_move(king_pos, r#move, self.color);
+        if !board_with_move.pos_in_danger(king_x, y, self.color) {
+            buffer.push(r#move);
+        }
+    }
 
     pub fn print_ascii(&self) {
         self.board.print_ascii(self.color);
