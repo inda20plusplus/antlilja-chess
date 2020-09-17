@@ -32,12 +32,6 @@ mod inner {
                         add_move(Move::PawnPromotion(PieceType::Bishop, to));
                         add_move(Move::PawnPromotion(PieceType::Rook, to));
                     }
-
-                    let board_after_move = self.board.board_after_move(from, r#move, self.color);
-                    if !board_after_move.pos_in_danger(self.king_pos.0, self.king_pos.1, self.color)
-                    {
-                        buffer.push(r#move);
-                    }
                 }
                 // Standard forward
                 else {
