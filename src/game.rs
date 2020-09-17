@@ -12,6 +12,7 @@ pub struct Game {
     move_map: MoveMap,
     history: Vec<Move>,
     color: Color,
+    king_pos: (u8, u8),
 }
 
 impl Game {
@@ -21,6 +22,7 @@ impl Game {
             move_map: MoveMap::new(),
             history: Vec::<Move>::with_capacity(50),
             color: Color::White,
+            king_pos: (4, 0),
         };
 
         game.calculate_all_moves();
@@ -31,6 +33,7 @@ impl Game {
     pub fn switch_side(&mut self) -> bool {
         self.move_map.clear();
         self.color.flip();
+        self.king_pos = self.board.find_king(self.color).to_xy();
         return self.calculate_all_moves();
     }
 
@@ -59,9 +62,8 @@ impl Game {
 
         self.history.push(r#move);
         if self.switch_side() {
-            let pos = self.board.find_king(self.color);
-            let xy = pos.to_xy();
-            if self.board.pos_in_danger(xy.0, xy.1, self.color) {
+            let (x, y) = self.king_pos;
+            if self.board.pos_in_danger(x, y, self.color) {
                 return Result::Checkmate;
             } else {
                 return Result::Stalemate;
@@ -200,6 +202,7 @@ impl Game {
         r#loop: bool,
     ) {
         let from = Pos::from_xy(x, y);
+        let is_king = self.at_pos(from).get_type() == PieceType::King;
 
         let mut add_move = |dir: &(i8, i8)| {
             let x = x as i8 + (dir.0 * step.0);
@@ -215,12 +218,13 @@ impl Game {
             let piece = self.at_xy(x, y);
 
             if piece.is_empty() || piece.get_color() != self.color {
-                let r#move = Move::Move(Pos::from_xy(x, y));
+                let to = Pos::from_xy(x, y);
+                let r#move = Move::Move(to);
+
+                let (king_x, king_y) = if is_king { (x, y) } else { self.king_pos };
 
                 let board_with_move = self.board.board_after_move(from, r#move, self.color);
-                let king_pos = board_with_move.find_king(self.color);
-                let xy = king_pos.to_xy();
-                if !board_with_move.pos_in_danger(xy.0, xy.1, self.color) {
+                if !board_with_move.pos_in_danger(king_x, king_y, self.color) {
                     buffer.push(r#move);
                 }
             }
