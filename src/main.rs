@@ -50,7 +50,7 @@ fn main() {
             continue;
         }
 
-        let r#move = Move::Move(Pos::from_xy(to.0, to.1));
+        let r#move = Move::move_xy(to.0, to.1);
 
         let moves = moves.unwrap();
 

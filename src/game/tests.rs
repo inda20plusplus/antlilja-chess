@@ -6,14 +6,9 @@ fn pawn_moves_new_board() {
 
     let check_side = |game: &mut Game, y_start, y_dir: i8| {
         for x in 0..8 {
-            let move_to = |to_y| {
-                let to = Pos::from_xy(x, to_y);
-                Move::Move(to)
-            };
-
             let correct_moves = MoveArray::from_slice(&[
-                move_to((y_start as i8 + y_dir) as u8),
-                move_to((y_start as i8 + y_dir * 2) as u8),
+                Move::move_xy(x, (y_start as i8 + y_dir) as u8),
+                Move::move_xy(x, (y_start as i8 + y_dir * 2) as u8),
             ]);
 
             assert_eq!(game.get_moves_for(x, y_start).unwrap(), &correct_moves);
@@ -42,10 +37,8 @@ fn knight_moves_new_board() {
     let mut game = Game::new();
 
     let check = |game: &Game, x, y, end_y| {
-        let correct_moves = MoveArray::from_slice(&[
-            Move::Move(Pos::from_xy(x + 1, end_y)),
-            Move::Move(Pos::from_xy(x - 1, end_y)),
-        ]);
+        let correct_moves =
+            MoveArray::from_slice(&[Move::move_xy(x + 1, end_y), Move::move_xy(x - 1, end_y)]);
 
         assert_eq!(game.get_moves_for(x, y).unwrap(), &correct_moves);
     };

@@ -46,7 +46,7 @@ mod inner {
                 {
                     let y_off = y as i8 + dir * 2;
                     if (0..8).contains(&y_off) && self.at_xy(x, y_off as u8).is_empty() {
-                        let r#move = Move::Move(Pos::from_xy(x, y_off as u8));
+                        let r#move = Move::move_xy(x, y_off as u8);
                         if is_safe_move(r#move) {
                             buffer.push(r#move);
                         }
@@ -57,7 +57,7 @@ mod inner {
             let mut add_pawn_take = |x: u8, y: u8| {
                 let space = self.at_xy(x, y);
                 if !space.is_empty() && space.get_color() != self.color {
-                    let r#move = Move::Move(Pos::from_xy(x, y));
+                    let r#move = Move::move_xy(x, y);
                     if is_safe_move(r#move) {
                         buffer.push(r#move);
                     }
@@ -79,7 +79,7 @@ mod inner {
             let mut loop_internal = |x, y| {
                 let space = self.board.at_xy(x, y);
                 if space.is_empty() || space.get_color() != self.color {
-                    let r#move = Move::Move(Pos::from_xy(x, y));
+                    let r#move = Move::move_xy(x, y);
                     if !self.king_in_danger_after_move(from, r#move) {
                         moves.push(r#move);
                     }
@@ -128,7 +128,7 @@ mod inner {
                     let piece = self.at_xy(x, y);
 
                     if piece.is_empty() || piece.get_color() != self.color {
-                        let r#move = Move::Move(Pos::from_xy(x, y));
+                        let r#move = Move::move_xy(x, y);
                         if !self.king_in_danger_after_move(from, r#move) {
                             moves.push(r#move);
                         }
@@ -164,7 +164,7 @@ mod inner {
                     let y = to_y as u8;
                     let piece = self.at_xy(x, y);
                     if piece.is_empty() || piece.get_color() != self.color {
-                        let r#move = Move::Move(Pos::from_xy(x, y));
+                        let r#move = Move::move_xy(x, y);
                         if !self.king_in_danger_after_move(from, r#move) {
                             moves.push(r#move);
                         }
@@ -190,7 +190,7 @@ mod inner {
 
                     let piece = self.at_xy(x, y);
                     if piece.is_empty() || piece.get_color() != self.color {
-                        let r#move = Move::Move(Pos::from_xy(x, y));
+                        let r#move = Move::move_xy(x, y);
                         if !self.king_in_danger_after_move(from, r#move) {
                             moves.push(r#move);
                         }
