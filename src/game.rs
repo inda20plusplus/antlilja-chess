@@ -155,23 +155,41 @@ impl Game {
 
     fn add_pawn_moves(&self, buffer: &mut MoveArray, x: u8, y: u8) {
         let dir: i8 = if self.color == Color::White { 1 } else { -1 };
-
         let from = Pos::from_xy(x, y);
+
         let mut add_move = |r#move| {
+            buffer.push(r#move);
+        };
+
+        let is_safe_move = |r#move| {
             let board_after_move = self.board.board_after_move(from, r#move, self.color);
-            if !board_after_move.pos_in_danger(self.king_pos.0, self.king_pos.1, self.color) {
-                buffer.push(r#move);
-            }
+            return !board_after_move.pos_in_danger(self.king_pos.0, self.king_pos.1, self.color);
         };
 
         let y_forward = (y as i8 + dir) as u8;
         if self.at_xy(x, y_forward).is_empty() {
             let to = Pos::from_xy(x, y_forward);
             if y_forward == 0 || y_forward == 7 {
-                add_move(Move::PawnPromotion(PieceType::Queen, to));
+                let r#move = Move::PawnPromotion(PieceType::Queen, to);
+
+                if is_safe_move(r#move) {
+                    add_move(r#move);
+                    add_move(Move::PawnPromotion(PieceType::Knight, to));
+                    add_move(Move::PawnPromotion(PieceType::Bishop, to));
+                    add_move(Move::PawnPromotion(PieceType::Rook, to));
+                }
+
+                let board_after_move = self.board.board_after_move(from, r#move, self.color);
+                if !board_after_move.pos_in_danger(self.king_pos.0, self.king_pos.1, self.color) {
+                    buffer.push(r#move);
+                }
             } else {
-                add_move(Move::Move(to));
+                let r#move = Move::Move(to);
+                if is_safe_move(r#move) {
+                    buffer.push(r#move);
+                }
             }
+
             let y_off = y as i8 + dir * 2;
             if (0..8).contains(&y_off) {
                 let y_off = y_off as u8;
@@ -180,7 +198,10 @@ impl Game {
                     || (y == 6 && self.color == Color::Black))
                     && self.at_xy(x, y_off).is_empty()
                 {
-                    add_move(Move::Move(Pos::from_xy(x, y_off)));
+                    let r#move = Move::Move(Pos::from_xy(x, y_off));
+                    if is_safe_move(r#move) {
+                        buffer.push(r#move);
+                    }
                 }
             }
         }
@@ -188,7 +209,10 @@ impl Game {
         let mut add_pawn_take = |x: u8, y: u8| {
             let space = self.at_xy(x, y);
             if !space.is_empty() && space.get_color() != self.color {
-                add_move(Move::Move(Pos::from_xy(x, y)));
+                let r#move = Move::Move(Pos::from_xy(x, y));
+                if is_safe_move(r#move) {
+                    buffer.push(r#move);
+                }
             }
         };
 
