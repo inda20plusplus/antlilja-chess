@@ -123,25 +123,20 @@ impl Game {
                 self.add_pawn_moves(&mut moves, x, y);
             }
             PieceType::Rook => {
-                self.add_direction_moves(&mut moves, x, y, (0, 1), true);
-                self.add_direction_moves(&mut moves, x, y, (1, 0), true);
+                self.add_straight_moves(&mut moves, x, y);
             }
             PieceType::Knight => {
-                self.add_direction_moves(&mut moves, x, y, (1, 2), false);
-                self.add_direction_moves(&mut moves, x, y, (2, 1), false);
+                self.add_knight_moves(&mut moves, x, y);
             }
             PieceType::Bishop => {
-                self.add_direction_moves(&mut moves, x, y, (1, 1), true);
+                self.add_diagonal_moves(&mut moves, x, y);
             }
             PieceType::Queen => {
-                self.add_direction_moves(&mut moves, x, y, (0, 1), true);
-                self.add_direction_moves(&mut moves, x, y, (1, 0), true);
-                self.add_direction_moves(&mut moves, x, y, (1, 1), true);
+                self.add_diagonal_moves(&mut moves, x, y);
+                self.add_straight_moves(&mut moves, x, y);
             }
             PieceType::King => {
-                self.add_direction_moves(&mut moves, x, y, (1, 0), false);
-                self.add_direction_moves(&mut moves, x, y, (0, 1), false);
-                self.add_direction_moves(&mut moves, x, y, (1, 1), false);
+                self.add_king_moves(&mut moves, x, y);
                 self.add_castling_moves(&mut moves);
             }
             _ => {
