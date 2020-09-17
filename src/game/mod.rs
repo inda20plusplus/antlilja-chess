@@ -46,6 +46,11 @@ impl Game {
         return self.color;
     }
 
+    fn king_in_danger_after_move(&self, from: Pos, r#move: Move) -> bool {
+        let board_after_move = self.board.board_after_move(from, r#move, self.color);
+        return board_after_move.pos_in_danger(self.king_pos.0, self.king_pos.1, self.color);
+    }
+
     pub fn play(&mut self, x: u8, y: u8, index: usize) -> Result {
         let pos = Pos::from_xy(x, y);
 
