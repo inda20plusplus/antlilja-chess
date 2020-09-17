@@ -253,30 +253,48 @@ impl Game {
     }
 
     fn add_castling_moves(&self, buffer: &mut MoveArray) {
-        let empty_at = |x, y| {
-            return self.at_xy(x, y).is_empty();
+        let y = if self.color == Color::White { 0 } else { 7 };
+        let king_pos = Pos::from_xy(4, y);
+
+        let mut board_without_king = self.board;
+        board_without_king.set_pos(king_pos, TaggedPiece::empty());
+
+        let empty_and_not_in_check = |x| {
+            if !self.at_xy(x, y).is_empty() {
+                return false;
+            }
+
+            if board_without_king.pos_in_danger(x, y, self.color) {
+                return false;
+            }
+
+            return true;
         };
 
-        let y = if self.color == Color::White { 0 } else { 7 };
-
-        let (r#move, king_x) =
-            if self.at_xy(0, y).is_original() && empty_at(1, y) && empty_at(2, y) && empty_at(3, y)
+        let (r#move, king_x) = if self.at_xy(0, y).is_original()
+            && empty_and_not_in_check(1)
+            && empty_and_not_in_check(2)
+            && empty_and_not_in_check(3)
             {
                 (Move::QueenSideCastling, 3)
-            } else if self.at_xy(7, y).is_original() && empty_at(5, y) && empty_at(6, y) {
+        } else if self.at_xy(7, y).is_original()
+            && empty_and_not_in_check(5)
+            && empty_and_not_in_check(6)
+        {
                 (Move::KingSideCastling, 6)
             } else {
                 (Move::None, 0)
             };
 
-            if r#move != Move::None {
-                let king_pos = Pos::from_xy(4, y);
+        if r#move == Move::None {
+            return;
+        }
+
                 let board_with_move = self.board.board_after_move(king_pos, r#move, self.color);
             if !board_with_move.pos_in_danger(king_x, y, self.color) {
                     buffer.push(r#move);
                 }
             }
-    }
 
     pub fn print_ascii(&self) {
         self.board.print_ascii(self.color);
