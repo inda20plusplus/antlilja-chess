@@ -4,8 +4,8 @@ use super::*;
 fn pawn_moves_new_board() {
     let mut game = Game::new();
 
-    for x in 0..8 {
-        let check_side = |board: &mut Game, y_start, y_dir: i8| {
+    let check_side = |game: &mut Game, y_start, y_dir: i8| {
+        for x in 0..8 {
             let move_to = |to_y| {
                 let to = Pos::from_xy(x, to_y);
                 Move::Move(to)
@@ -16,14 +16,13 @@ fn pawn_moves_new_board() {
                 move_to((y_start as i8 + y_dir * 2) as u8),
             ]);
 
-            assert_eq!(board.get_moves_for(x, y_start).unwrap(), &correct_moves);
-        };
+            assert_eq!(game.get_moves_for(x, y_start).unwrap(), &correct_moves);
+        }
+    };
 
-        check_side(&mut game, 1, 1);
-        game.switch_side();
-        check_side(&mut game, 6, -1);
-        game.switch_side();
-    }
+    check_side(&mut game, 1, 1);
+    game.switch_side();
+    check_side(&mut game, 6, -1);
 }
 
 #[test]
