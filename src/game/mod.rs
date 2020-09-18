@@ -59,12 +59,7 @@ impl Game {
         assert!(pos.as_index() < 64);
         assert!(!self.at_pos(pos).is_empty());
 
-        let moves: &MoveArray = if self.move_map.at(pos).is_empty() {
-            self.get_moves_for(x, y);
-            &self.move_map.at(pos)
-        } else {
-            &self.move_map.at(pos)
-        };
+        let moves = self.move_map.at(pos);
 
         if !moves.exists(r#move) {
             return Result::InvalidMove;
