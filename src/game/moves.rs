@@ -209,9 +209,13 @@ mod inner {
                     let y = to_y as u8;
 
                     let piece = self.at_xy(x, y);
+                    
                     if piece.is_empty() || piece.get_color() != self.color {
-                        let r#move = Move::move_xy(x, y);
-                        if !self.king_in_danger_after_move(from, r#move) {
+                        
+                        let r#move = Move::move_xy(x, y);   
+                        let board_after_move = self.board.board_after_move(from, r#move, self.color);
+                        
+                        if !board_after_move.pos_in_danger(x, y, self.color) {
                             moves.push(r#move);
                         }
                     }
