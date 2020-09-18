@@ -1,4 +1,3 @@
-#[allow(dead_code)]
 #[derive(Copy, Clone, PartialEq, Debug)]
 #[repr(u8)]
 pub enum PieceType {
