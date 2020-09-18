@@ -97,6 +97,10 @@ impl Game {
         return self.board.at_index(i);
     }
 
+    pub fn board(&self) -> &Board {
+        &self.board
+    }
+
     fn calculate_all_moves(&mut self) -> bool {
         let mut checkmate = true;
         for y in 0..8 {
