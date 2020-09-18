@@ -113,8 +113,8 @@ mod inner {
             }
 
             // Left
-            for x in x..0 {
-                if !loop_internal(x, y) {
+            for dist in 1..(x+1) {
+                if !loop_internal(x-dist, y) {
                     break;
                 }
             }
@@ -127,8 +127,8 @@ mod inner {
             }
 
             // Down
-            for y in y..0 {
-                if !loop_internal(x, y) {
+            for dist in 1..(y+1) {
+                if !loop_internal(x, y-dist) {
                     break;
                 }
             }
