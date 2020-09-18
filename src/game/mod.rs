@@ -102,16 +102,14 @@ impl Game {
     }
 
     fn calculate_all_moves(&mut self) -> bool {
-        let mut checkmate = true;
+        let mut moves: usize = 0;
         for y in 0..8 {
             for x in 0..8 {
-                if self.calculate_moves_for(x, y) > 0 {
-                    checkmate = false;
+                moves += self.calculate_moves_for(x, y);
                 }
             }
-        }
 
-        return checkmate;
+        return moves == 0;
     }
 
     fn calculate_moves_for(&mut self, x: u8, y: u8) -> usize {
