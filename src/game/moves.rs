@@ -101,21 +101,21 @@ mod inner {
                         moves.push(r#move);
                     }
                 }
-
+                
                 return space.is_empty();
             };
-
+            
             // Right
             for x in (x + 1)..8 {
                 if !loop_internal(x, y) {
                     break;
                 }
             }
-
+            
             // Left
             for dist in 1..(x+1) {
                 if !loop_internal(x-dist, y) {
-                    break;
+                     break;
                 }
             }
 
@@ -174,19 +174,22 @@ mod inner {
             let from = Pos::from_xy(x, y);
 
             let mut add_move = |x_dir: i8, y_dir: i8| {
-                let to_x = x as i8 + x_dir;
-                let to_y = y as i8 + y_dir * 2;
-                if (0..8).contains(&to_x) && (0..8).contains(&to_y) {
-                    let x = to_x as u8;
-                    let y = to_y as u8;
-                    let piece = self.at_xy(x, y);
-                    if piece.is_empty() || piece.get_color() != self.color {
-                        let r#move = Move::move_xy(x, y);
-                        if !self.king_in_danger_after_move(from, r#move) {
-                            moves.push(r#move);
+                let mut add = |to_x, to_y| {
+                    if (0..8).contains(&to_x) && (0..8).contains(&to_y) {
+                        let x = to_x as u8;
+                        let y = to_y as u8;
+                        let piece = self.at_xy(x, y);
+                        if piece.is_empty() || piece.get_color() != self.color {
+                            let r#move = Move::move_xy(x, y);
+                            if !self.king_in_danger_after_move(from, r#move) {
+                                moves.push(r#move);
+                            }
                         }
-                    }
+                    };
                 };
+
+                add(x as i8 + x_dir, y as i8 + y_dir * 2);
+                add(x as i8 + x_dir * 2, y as i8 + y_dir);
             };
 
             add_move(1, 1);
