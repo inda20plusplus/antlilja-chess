@@ -116,7 +116,7 @@ impl Game {
         let pos = Pos::from_xy(x, y);
         let piece = self.at_pos(pos);
 
-        if piece.get_color() != self.color {
+        if piece.is_empty() || piece.get_color() != self.color {
             return 0;
         }
 
