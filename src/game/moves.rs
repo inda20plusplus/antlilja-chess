@@ -158,7 +158,7 @@ mod inner {
             };
 
             // SW
-            check(-1, -1, min(x, y));
+            check(-1, -1, min(x, y) + 1);
 
             // SE
             check(1, -1, min(8 - x, y));
