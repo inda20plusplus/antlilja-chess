@@ -223,6 +223,10 @@ mod inner {
             };
 
             check(1, 1);
+            check(1, 0);
+            check(0, 1);
+            check(0, -1);
+            check(-1, 0);
             check(-1, 1);
             check(-1, -1);
             check(1, -1);
