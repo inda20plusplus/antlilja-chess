@@ -42,17 +42,17 @@ mod inner {
             let mut add_pawn_take = |to| {
                 let space = self.at_pos(to);
 
-                let last = self.history.last();
                 let r#move = 
                 // Standard diagonal pawn take
                 if !space.is_empty() && space.color() != self.color {
                     Move::Move(to)
                 } 
                 // En passant
-                else if let Some((last_from, last_move)) = last {
+                else if self.last_move.0 != Pos::invalid() {
+                    let (last_from, last_move) = self.last_move;
                     let mut r#move = Move::None;
                     if let Move::Move(last_to) = last_move {
-                        if last_from.distance_y(last_to) == 2 && last_from.move_y_non_fail(y_dir * -1) == to {
+                        if last_from.distance_y(&last_to) == 2 && last_from.move_y_non_fail(y_dir * -1) == to {
                             r#move = Move::EnPassant(to)
                         }
                     }

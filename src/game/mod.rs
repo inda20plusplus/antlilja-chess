@@ -17,7 +17,8 @@ pub enum Result {
 pub struct Game {
     board: Board,
     move_map: MoveMap,
-    history: Vec<(Pos, Move)>,
+    history: Vec<Board>,
+    last_move: (Pos, Move),
     color: Color,
     king_pos: Pos,
 }
@@ -27,7 +28,8 @@ impl Game {
         let mut game = Game {
             board: Board::new(),
             move_map: MoveMap::new(),
-            history: Vec::<(Pos, Move)>::with_capacity(50),
+            history: Vec::<Board>::with_capacity(50),
+            last_move: (Pos::invalid(), Move::None),
             color: Color::White,
             king_pos: Pos::new_xy(4, 0),
         };
@@ -73,9 +75,11 @@ impl Game {
             return Result::InvalidMove;
         }
 
+        self.history.push(self.board);
+        self.last_move = (from, r#move);
+
         self.board = self.board.board_after_move(from, r#move, self.color);
 
-        self.history.push((from, r#move));
         if self.switch_side() {
             if self.board.pos_in_danger(self.king_pos, self.color) {
                 return Result::Checkmate;
