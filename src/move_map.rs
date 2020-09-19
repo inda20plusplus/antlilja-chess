@@ -120,7 +120,7 @@ impl MoveMap {
     }
 
     pub fn at(&self, pos: Pos) -> Option<&[Move]> {
-        let index = self.find_used_index(pos.as_index());
+        let index = self.find_used_index(pos.index());
 
         if index.is_none() {
             return None;
@@ -133,7 +133,7 @@ impl MoveMap {
     }
 
     pub fn set_current_pos(&mut self, pos: Pos) {
-        let board_index = pos.as_index();
+        let board_index = pos.index();
         self.current_piece_index = self.find_new_index(board_index);
         self.pieces[self.current_piece_index] =
             PieceMoves::new(self.current_stack_index as u8, board_index as u8);
