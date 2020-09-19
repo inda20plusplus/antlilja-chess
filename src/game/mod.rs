@@ -90,6 +90,23 @@ impl Game {
         }
     }
 
+    pub fn undo(&mut self, steps: usize) -> bool {
+        if steps >= self.history.len() {
+            return false;
+        }
+
+        self.board = self.history[self.history.len() - 1 - steps].0;
+        self.history.truncate(self.history.len() - steps);
+
+        if steps % 2 != 0 {
+            self.color.flip();
+        }
+
+        self.king_pos = self.board.find_king(self.color);
+        let _ = self.calculate_all_moves();
+        true
+    }
+
     pub fn at_xy(&self, x: u8, y: u8) -> TaggedPiece {
         return self.board.at_xy(x, y);
     }
