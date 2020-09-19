@@ -3,7 +3,7 @@ pub struct Pos(u8);
 
 impl Pos {
     pub fn from_xy(x: u8, y: u8) -> Self {
-        return Pos { 0: y * 8 + x };
+        return Pos { 0: x | (y << 3) };
     }
 
     pub fn from_index(i: u8) -> Self {
@@ -15,9 +15,7 @@ impl Pos {
     }
 
     pub fn to_xy(&self) -> (u8, u8) {
-        let y = self.0 / 8;
-        let x = self.0 - (y * 8);
-        return (x, y);
+        return (self.0 & 0b111, self.0 >> 3);
     }
 }
 
@@ -36,10 +34,10 @@ mod tests {
         for x in 0..8 {
             for y in 0..8 {
                 let pos = Pos::from_xy(x, y);
-                let xy = pos.to_xy();
+                let (pos_x, pos_y) = pos.to_xy();
 
-                assert_eq!(x, xy.0);
-                assert_eq!(y, xy.1);
+                assert_eq!(x, pos_x);
+                assert_eq!(y, pos_y);
             }
         }
     }
