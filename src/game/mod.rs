@@ -142,9 +142,6 @@ impl Game {
                 self.add_king_moves(pos);
                 self.add_castling_moves();
             }
-            _ => {
-                return 0;
-            }
         };
 
         return self.move_map.current_pos_moves_len();

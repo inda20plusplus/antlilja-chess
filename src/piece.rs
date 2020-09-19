@@ -3,7 +3,6 @@ use crate::Color;
 #[derive(Copy, Clone, PartialEq, Debug)]
 #[repr(u8)]
 pub enum PieceType {
-    None = 0,
     Pawn = 1,
     Rook = 2,
     Knight = 3,
@@ -69,14 +68,17 @@ impl TaggedPiece {
 
 impl std::fmt::Debug for TaggedPiece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut c = match self.get_type() {
-            PieceType::Pawn => 'P',
-            PieceType::Rook => 'R',
-            PieceType::Knight => 'N',
-            PieceType::Bishop => 'B',
-            PieceType::Queen => 'Q',
-            PieceType::King => 'K',
-            _ => '.',
+        let mut c = if self.is_empty() {
+            '.'
+        } else {
+            match self.get_type() {
+                PieceType::Pawn => 'P',
+                PieceType::Rook => 'R',
+                PieceType::Knight => 'N',
+                PieceType::Bishop => 'B',
+                PieceType::Queen => 'Q',
+                PieceType::King => 'K',
+            }
         };
 
         if self.color() == Color::Black {
