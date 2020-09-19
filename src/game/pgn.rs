@@ -68,21 +68,23 @@ fn lex_pgn(pmove: &str) -> (PieceType, Vec<Token>) {
 }
 
 impl Game {
-    pub fn parse_pgn_move(&self, pmove: &str) -> ((u8, u8), Move) {
+    pub fn parse_pgn_move(&self, pmove: &str) -> (Pos, Move) {
+        const INVALID: (Pos, Move) = (Pos::invalid(), Move::None);
+
         if pmove.is_empty() {
-            return ((0, 0), Move::None);
+            return INVALID;
         }
 
         if pmove == "O-O" {
             return (
-                (4, if self.color == Color::White { 0 } else { 7 }),
+                Pos::new_index(if self.color == Color::White { 4 } else { 60 }),
                 Move::KingSideCastling,
             );
         }
 
         if pmove == "O-O-O" {
             return (
-                (4, if self.color == Color::White { 0 } else { 7 }),
+                Pos::new_index(if self.color == Color::White { 4 } else { 60 }),
                 Move::QueenSideCastling,
             );
         }
@@ -91,7 +93,7 @@ impl Game {
 
         match tokens[..] {
             [Token::File(x), Token::Rank(y)] => {
-                let pos = Pos::from_xy(x, y);
+                let pos = Pos::new_xy(x, y);
                 let move_move = Move::Move(pos);
                 let en_passant_move = Move::EnPassant(pos);
                 for i in 0..64 {
@@ -100,86 +102,84 @@ impl Game {
                         && space.get_color() == self.color
                         && space.get_type() == piece
                     {
-                        let (from_x, from_y) = Pos::from_index(i as u8).to_xy();
-                        let moves = self.get_moves_for(from_x, from_y);
-                        if let Some(moves) = moves {
+                        let from = Pos::new_index(i as u8);
+                        if let Some(moves) = self.get_moves_for(from) {
                             if moves.contains(&move_move) {
-                                return ((from_x, from_y), move_move);
+                                return (from, move_move);
                             }
 
                             if piece == PieceType::Pawn && moves.contains(&en_passant_move) {
-                                return ((from_x, from_y), en_passant_move);
+                                return (from, en_passant_move);
                             }
                         }
                     }
                 }
-                return ((0, 0), Move::None);
+                return INVALID;
             }
             [Token::File(from_x), Token::File(x), Token::Rank(y)] => {
-                let pos = Pos::from_xy(x, y);
+                let pos = Pos::new_xy(x, y);
                 let move_move = Move::Move(pos);
                 let en_passant_move = Move::EnPassant(pos);
                 for from_y in 0..8 {
-                    let space = self.at_xy(from_x, from_y);
+                    let from = Pos::new_xy(from_x, from_y);
+                    let space = self.at_pos(from);
                     if !space.is_empty()
                         && space.get_color() == self.color
                         && space.get_type() == piece
                     {
-                        let moves = self.get_moves_for(from_x, from_y);
-                        if let Some(moves) = moves {
+                        if let Some(moves) = self.get_moves_for(from) {
                             if moves.contains(&move_move) {
-                                return ((from_x, from_y), move_move);
+                                return (from, move_move);
                             }
 
                             if piece == PieceType::Pawn && moves.contains(&en_passant_move) {
-                                return ((from_x, from_y), en_passant_move);
+                                return (from, en_passant_move);
                             }
                         }
                     }
                 }
-                return ((0, 0), Move::None);
+                return INVALID;
             }
             [Token::Rank(from_y), Token::File(x), Token::Rank(y)] => {
-                let pos = Pos::from_xy(x, y);
+                let pos = Pos::new_xy(x, y);
                 let move_move = Move::Move(pos);
                 let en_passant_move = Move::EnPassant(pos);
                 for from_x in 0..8 {
-                    let space = self.at_xy(from_x, from_y);
+                    let from = Pos::new_xy(from_x, from_y);
+                    let space = self.at_pos(from);
                     if !space.is_empty()
                         && space.get_color() == self.color
                         && space.get_type() == piece
                     {
-                        let moves = self.get_moves_for(from_x, from_y);
-                        if let Some(moves) = moves {
+                        if let Some(moves) = self.get_moves_for(from) {
                             if moves.contains(&move_move) {
-                                return ((from_x, from_y), move_move);
+                                return (from, move_move);
                             }
 
                             if piece == PieceType::Pawn && moves.contains(&en_passant_move) {
-                                return ((from_x, from_y), en_passant_move);
+                                return (from, en_passant_move);
                             }
                         }
                     }
                 }
-                return ((0, 0), Move::None);
+                return INVALID;
             }
             [Token::File(x), Token::Rank(y), Token::Promotion, Token::Piece(piece)] => {
                 let dir: i8 = if self.color == Color::White { -1 } else { 1 };
-                return (
-                    (x, (y as i8 + dir) as u8),
-                    Move::PawnPromotion(piece, Pos::from_xy(x, y)),
-                );
+                let from = Pos::new_xy(x, y).move_y_non_fail(dir);
+                return (from, Move::PawnPromotion(piece, Pos::new_xy(x, y)));
             }
             [Token::File(from_x), Token::Rank(from_y), Token::File(x), Token::Rank(y)] => {
-                let pos = Pos::from_xy(x, y);
-                if piece == PieceType::Pawn && from_x != x && self.at_xy(x, y).is_empty() {
-                    return ((from_x, from_y), Move::EnPassant(pos));
+                let pos = Pos::new_xy(x, y);
+                let from = Pos::new_xy(from_x, from_y);
+                if piece == PieceType::Pawn && from_x != x && self.at_pos(pos).is_empty() {
+                    return (from, Move::EnPassant(pos));
                 }
-                return ((from_x, from_y), Move::Move(pos));
+                return (from, Move::Move(pos));
             }
             _ => {}
         }
 
-        return ((0, 0), Move::None);
+        return INVALID;
     }
 }

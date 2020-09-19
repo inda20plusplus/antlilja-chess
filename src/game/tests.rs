@@ -4,14 +4,15 @@ use super::*;
 fn pawn_moves_new_board() {
     let mut game = Game::new();
 
-    let check_side = |game: &mut Game, y_start, y_dir: i8| {
+    let check_side = |game: &mut Game, y_start: u8, y_dir: i8| {
         for x in 0..8 {
+            let from = Pos::new_xy(x, y_start);
             let correct_moves = [
-                Move::move_xy(x, (y_start as i8 + y_dir) as u8),
-                Move::move_xy(x, (y_start as i8 + y_dir * 2) as u8),
+                Move::Move(from.move_y_non_fail(y_dir)),
+                Move::Move(from.move_y_non_fail(y_dir * 2)),
             ];
 
-            assert_eq!(game.get_moves_for(x, y_start).unwrap(), &correct_moves);
+            assert_eq!(game.get_moves_for(from).unwrap(), &correct_moves);
         }
     };
 
@@ -24,63 +25,64 @@ fn pawn_moves_new_board() {
 fn rook_moves_new_board() {
     let mut game = Game::new();
 
-    assert!(game.get_moves_for(0, 0).unwrap().is_empty());
-    assert!(game.get_moves_for(7, 0).unwrap().is_empty());
+    assert!(game.get_moves_for(Pos::new_xy(0, 0)).unwrap().is_empty());
+    assert!(game.get_moves_for(Pos::new_xy(7, 0)).unwrap().is_empty());
 
     game.switch_side();
-    assert!(game.get_moves_for(0, 7).unwrap().is_empty());
-    assert!(game.get_moves_for(7, 7).unwrap().is_empty());
+    assert!(game.get_moves_for(Pos::new_xy(0, 7)).unwrap().is_empty());
+    assert!(game.get_moves_for(Pos::new_xy(7, 7)).unwrap().is_empty());
 }
 
 #[test]
 fn knight_moves_new_board() {
     let mut game = Game::new();
 
-    let check = |game: &Game, x, y, end_y| {
-        let correct_moves = [Move::move_xy(x + 1, end_y), Move::move_xy(x - 1, end_y)];
+    let check = |game: &Game, pos: Pos, end_y| {
+        let move_pos = Pos::new_xy(pos.x(), end_y);
+        let correct_moves = [Move::Move(move_pos.add_x(1)), Move::Move(move_pos.sub_x(1))];
 
-        assert_eq!(game.get_moves_for(x, y).unwrap(), &correct_moves);
+        assert_eq!(game.get_moves_for(pos).unwrap(), &correct_moves);
     };
 
-    check(&game, 1, 0, 2);
-    check(&game, 6, 0, 2);
+    check(&game, Pos::new_xy(1, 0), 2);
+    check(&game, Pos::new_xy(6, 0), 2);
 
     game.switch_side();
 
-    check(&game, 1, 7, 5);
-    check(&game, 6, 7, 5);
+    check(&game, Pos::new_xy(1, 7), 5);
+    check(&game, Pos::new_xy(6, 7), 5);
 }
 
 #[test]
 fn bishop_moves_new_board() {
     let mut game = Game::new();
 
-    assert!(game.get_moves_for(2, 0).unwrap().is_empty());
-    assert!(game.get_moves_for(5, 0).unwrap().is_empty());
+    assert!(game.get_moves_for(Pos::new_xy(2, 0)).unwrap().is_empty());
+    assert!(game.get_moves_for(Pos::new_xy(5, 0)).unwrap().is_empty());
 
     game.switch_side();
-    assert!(game.get_moves_for(2, 7).unwrap().is_empty());
-    assert!(game.get_moves_for(5, 7).unwrap().is_empty());
+    assert!(game.get_moves_for(Pos::new_xy(2, 7)).unwrap().is_empty());
+    assert!(game.get_moves_for(Pos::new_xy(5, 7)).unwrap().is_empty());
 }
 
 #[test]
 fn queen_moves_new_board() {
     let mut game = Game::new();
 
-    assert!(game.get_moves_for(3, 0).unwrap().is_empty());
+    assert!(game.get_moves_for(Pos::new_xy(3, 0)).unwrap().is_empty());
 
     game.switch_side();
-    assert!(game.get_moves_for(3, 7).unwrap().is_empty());
+    assert!(game.get_moves_for(Pos::new_xy(3, 7)).unwrap().is_empty());
 }
 
 #[test]
 fn king_moves_new_board() {
     let mut game = Game::new();
 
-    assert!(game.get_moves_for(4, 0).unwrap().is_empty());
+    assert!(game.get_moves_for(Pos::new_xy(4, 0)).unwrap().is_empty());
 
     game.switch_side();
-    assert!(game.get_moves_for(4, 7).unwrap().is_empty());
+    assert!(game.get_moves_for(Pos::new_xy(4, 7)).unwrap().is_empty());
 }
 
 #[test]
@@ -95,10 +97,10 @@ fn test_with_whole_game() {
     let moves = moves.trim().split_whitespace();
 
     for (i, str_move) in moves.enumerate() {
-        let ((x, y), actual_move) = game.parse_pgn_move(str_move);
+        let (from, actual_move) = game.parse_pgn_move(str_move);
         assert_ne!(actual_move, Move::None);
 
-        let result = game.play(x, y, actual_move);
+        let result = game.play(from, actual_move);
         if result == Result::Checkmate {
             println!("{}", str_move);
             assert_eq!(game.current_color(), Color::Black);
