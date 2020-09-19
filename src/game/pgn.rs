@@ -69,6 +69,10 @@ fn lex_pgn(pmove: &str) -> (PieceType, Vec<Token>) {
 
 impl Game {
     pub fn parse_pgn_move(&self, pmove: &str) -> ((u8, u8), Move) {
+        if pmove.is_empty() {
+            return ((0, 0), Move::None);
+        }
+
         if pmove == "O-O" {
             return (
                 (4, if self.color == Color::White { 0 } else { 7 }),
