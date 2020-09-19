@@ -45,7 +45,7 @@ mod inner {
                 let last = self.history.last();
                 let r#move = 
                 // Standard diagonal pawn take
-                if !space.is_empty() && space.get_color() != self.color {
+                if !space.is_empty() && space.color() != self.color {
                     Move::Move(to)
                 } 
                 // En passant
@@ -80,7 +80,7 @@ mod inner {
         pub fn add_straight_moves(&mut self, from: Pos) {
             let mut loop_internal = |to| {
                 let space = self.board.at_pos(to);
-                if space.is_empty() || space.get_color() != self.color {
+                if space.is_empty() || space.color() != self.color {
                     let r#move = Move::Move(to);
                     if !self.king_in_danger_after_move(from, r#move) {
                         self.move_map.insert(r#move);
@@ -130,7 +130,7 @@ mod inner {
                     let to = from.move_xy_non_fail(off * x_dir, off * y_dir);
                     let piece = self.at_pos(to);
 
-                    if piece.is_empty() || piece.get_color() != self.color {
+                    if piece.is_empty() || piece.color() != self.color {
                         let r#move = Move::Move(to);
                         if !self.king_in_danger_after_move(from, r#move) {
                             self.move_map.insert(r#move);
@@ -160,7 +160,7 @@ mod inner {
             let mut add_move = |x_dir: i8, y_dir: i8| {
                 let mut add = |to| {
                     let piece = self.at_pos(to);
-                    if piece.is_empty() || piece.get_color() != self.color {
+                    if piece.is_empty() || piece.color() != self.color {
                         let r#move = Move::Move(to);
                         if !self.king_in_danger_after_move(from, r#move) {
                             self.move_map.insert(r#move);
@@ -189,7 +189,7 @@ mod inner {
                 if let Some(to) = from.move_xy(x_dir, y_dir) {
                     let piece = self.at_pos(to);
                     
-                    if piece.is_empty() || piece.get_color() != self.color {
+                    if piece.is_empty() || piece.color() != self.color {
                         let r#move = Move::Move(to);   
                         let board_after_move = self.board.board_after_move(from, r#move, self.color);
                         

@@ -115,7 +115,7 @@ impl Game {
     fn calculate_moves_for(&mut self, pos: Pos) -> usize {
         let piece = self.at_pos(pos);
 
-        if piece.is_empty() || piece.get_color() != self.color {
+        if piece.is_empty() || piece.color() != self.color {
             return 0;
         }
 

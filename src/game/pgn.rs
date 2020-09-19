@@ -98,9 +98,7 @@ impl Game {
                 let en_passant_move = Move::EnPassant(pos);
                 for i in 0..64 {
                     let space = self.at_index(i);
-                    if !space.is_empty()
-                        && space.get_color() == self.color
-                        && space.get_type() == piece
+                    if !space.is_empty() && space.color() == self.color && space.get_type() == piece
                     {
                         let from = Pos::new_index(i as u8);
                         if let Some(moves) = self.get_moves_for(from) {
@@ -123,9 +121,7 @@ impl Game {
                 for from_y in 0..8 {
                     let from = Pos::new_xy(from_x, from_y);
                     let space = self.at_pos(from);
-                    if !space.is_empty()
-                        && space.get_color() == self.color
-                        && space.get_type() == piece
+                    if !space.is_empty() && space.color() == self.color && space.get_type() == piece
                     {
                         if let Some(moves) = self.get_moves_for(from) {
                             if moves.contains(&move_move) {
@@ -147,9 +143,7 @@ impl Game {
                 for from_x in 0..8 {
                     let from = Pos::new_xy(from_x, from_y);
                     let space = self.at_pos(from);
-                    if !space.is_empty()
-                        && space.get_color() == self.color
-                        && space.get_type() == piece
+                    if !space.is_empty() && space.color() == self.color && space.get_type() == piece
                     {
                         if let Some(moves) = self.get_moves_for(from) {
                             if moves.contains(&move_move) {

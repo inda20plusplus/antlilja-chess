@@ -127,7 +127,7 @@ impl Board {
                     let piece = self.at_pos(pos);
 
                     if !piece.is_empty() {
-                        if piece.get_color() == color {
+                        if piece.color() == color {
                             return None;
                         } else {
                             return Some(new_pos);

@@ -56,7 +56,7 @@ impl TaggedPiece {
         }
     }
 
-    pub fn get_color(&self) -> Color {
+    pub fn color(&self) -> Color {
         unsafe {
             return std::mem::transmute(self.0 & 128);
         }
@@ -79,7 +79,7 @@ impl std::fmt::Debug for TaggedPiece {
             _ => '.',
         };
 
-        if self.get_color() == Color::Black {
+        if self.color() == Color::Black {
             c = c.to_ascii_lowercase();
         }
 
@@ -122,11 +122,11 @@ mod tests {
     fn get_color() {
         fn color_persists(r#type: PieceType) {
             assert_eq!(
-                TaggedPiece::original(r#type, Color::White).get_color(),
+                TaggedPiece::original(r#type, Color::White).color(),
                 Color::White
             );
             assert_eq!(
-                TaggedPiece::original(r#type, Color::Black).get_color(),
+                TaggedPiece::original(r#type, Color::Black).color(),
                 Color::Black
             );
         }
