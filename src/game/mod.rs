@@ -50,9 +50,12 @@ impl Game {
         return self.color;
     }
 
-    fn king_in_danger_after_move(&self, from: Pos, r#move: Move) -> bool {
-        let board_after_move = self.board.board_after_move(from, r#move, self.color);
-        return board_after_move.pos_in_danger(self.king_pos, self.color);
+    pub fn moves_for_pos(&self, pos: Pos) -> Option<&[Move]> {
+        return self.move_map.at(pos);
+    }
+
+    pub fn print_ascii(&self) {
+        self.board.print_ascii(self.color);
     }
 
     pub fn play(&mut self, from: Pos, r#move: Move) -> Result {
@@ -151,11 +154,8 @@ impl Game {
         return self.move_map.current_pos_moves_len();
     }
 
-    pub fn moves_for_pos(&self, pos: Pos) -> Option<&[Move]> {
-        return self.move_map.at(pos);
-    }
-
-    pub fn print_ascii(&self) {
-        self.board.print_ascii(self.color);
+    fn king_in_danger_after_move(&self, from: Pos, r#move: Move) -> bool {
+        let board_after_move = self.board.board_after_move(from, r#move, self.color);
+        return board_after_move.pos_in_danger(self.king_pos, self.color);
     }
 }
