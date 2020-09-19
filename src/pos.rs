@@ -41,4 +41,16 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn pos_equal_to_index() {
+        for x in 0..8 {
+            for y in 0..8 {
+                let index = (y * 8 + x) as usize;
+                let pos_index = Pos::from_xy(x, y).as_index();
+
+                assert_eq!(index, pos_index);
+            }
+        }
+    }
 }
