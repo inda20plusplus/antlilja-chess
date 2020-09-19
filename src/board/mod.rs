@@ -33,7 +33,7 @@ impl Board {
         place_at_both_sides(3, PieceType::Queen);
         place_at_both_sides(4, PieceType::King);
 
-        return data;
+        data
     }
 
     pub fn set_pos(&mut self, pos: Pos, piece: TaggedPiece) {
@@ -41,15 +41,15 @@ impl Board {
     }
 
     pub fn at_pos(&self, pos: Pos) -> TaggedPiece {
-        return self.0[pos.index()];
+        self.0[pos.index()]
     }
 
     pub fn at_xy(&self, x: u8, y: u8) -> TaggedPiece {
-        return self.at_pos(Pos::new_xy(x, y));
+        self.at_pos(Pos::new_xy(x, y))
     }
 
     pub fn at_index(&self, i: usize) -> TaggedPiece {
-        return self.0[i];
+        self.0[i]
     }
 
     pub fn move_piece(&mut self, from: Pos, to: Pos) -> bool {
@@ -59,7 +59,7 @@ impl Board {
 
         self.set_pos(to, self.at_pos(from).non_original());
         self.set_pos(from, TaggedPiece::empty());
-        return true;
+        true
     }
 
     pub fn find_first_of_type(&self, r#type: PieceType, color: Color) -> Option<Pos> {
@@ -70,11 +70,11 @@ impl Board {
             }
         }
 
-        return None;
+        None
     }
 
     pub fn find_king(&self, color: Color) -> Pos {
-        return self.find_first_of_type(PieceType::King, color).unwrap();
+        self.find_first_of_type(PieceType::King, color).unwrap()
     }
 
     pub fn board_after_move(&self, from: Pos, r#move: Move, color: Color) -> Self {
@@ -159,8 +159,7 @@ impl Board {
                     return true;
                 }
             }
-
-            return false;
+            false
         };
 
         let dirs: [(i8, i8, Color); 4] = [
@@ -191,7 +190,7 @@ impl Board {
                     return true;
                 }
             }
-            return false;
+            false
         };
 
         let dirs: [(i8, i8); 4] = [(1, 0), (0, 1), (-1, 0), (0, -1)];
@@ -202,7 +201,7 @@ impl Board {
             }
         }
 
-        return false;
+        false
     }
 
     pub fn print_ascii(&self, color: Color) {

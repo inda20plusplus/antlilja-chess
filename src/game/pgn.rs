@@ -68,7 +68,7 @@ fn lex_pgn(pmove: &str) -> Option<(PieceType, Vec<Token>)> {
         }
     }
 
-    return Some((piece, buffer));
+    Some((piece, buffer))
 }
 
 impl Game {
@@ -183,6 +183,6 @@ impl Game {
                 _ => {}
             }
         }
-        return INVALID;
+        INVALID
     }
 }

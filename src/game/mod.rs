@@ -34,22 +34,22 @@ impl Game {
 
         game.calculate_all_moves();
 
-        return game;
+        game
     }
 
     pub fn switch_side(&mut self) -> bool {
         self.move_map.clear();
         self.color.flip();
         self.king_pos = self.board.find_king(self.color);
-        return self.calculate_all_moves();
+        self.calculate_all_moves()
     }
 
     pub fn current_color(&self) -> Color {
-        return self.color;
+        self.color
     }
 
     pub fn moves_for_pos(&self, pos: Pos) -> Option<&[Move]> {
-        return self.move_map.at(pos);
+        self.move_map.at(pos)
     }
 
     pub fn print_ascii(&self) {
@@ -81,12 +81,12 @@ impl Game {
 
         if self.switch_side() {
             if self.board.pos_in_danger(self.king_pos, self.color) {
-                return Result::Checkmate;
+                Result::Checkmate
             } else {
-                return Result::Stalemate;
+                Result::Stalemate
             }
         } else {
-            return Result::Ok;
+            Result::Ok
         }
     }
 
@@ -108,15 +108,15 @@ impl Game {
     }
 
     pub fn at_xy(&self, x: u8, y: u8) -> TaggedPiece {
-        return self.board.at_xy(x, y);
+        self.board.at_xy(x, y)
     }
 
     pub fn at_pos(&self, pos: Pos) -> TaggedPiece {
-        return self.board.at_pos(pos);
+        self.board.at_pos(pos)
     }
 
     pub fn at_index(&self, i: usize) -> TaggedPiece {
-        return self.board.at_index(i);
+        self.board.at_index(i)
     }
 
     pub fn board(&self) -> &Board {
@@ -138,7 +138,7 @@ impl Game {
             moves += self.calculate_moves_for(Pos::new_index(i));
         }
 
-        return moves == 0;
+        moves == 0
     }
 
     fn calculate_moves_for(&mut self, pos: Pos) -> usize {
@@ -173,11 +173,11 @@ impl Game {
             }
         };
 
-        return self.move_map.current_pos_moves_len();
+        self.move_map.current_pos_moves_len()
     }
 
     fn king_in_danger_after_move(&self, from: Pos, r#move: Move) -> bool {
         let board_after_move = self.board.board_after_move(from, r#move, self.color);
-        return board_after_move.pos_in_danger(self.king_pos, self.color);
+        board_after_move.pos_in_danger(self.king_pos, self.color)
     }
 }
