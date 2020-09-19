@@ -12,3 +12,17 @@ impl Color {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn flip() {
+        let mut color = Color::White;
+        color.flip();
+        assert_eq!(color, Color::Black);
+        color.flip();
+        assert_eq!(color, Color::White);
+    }
+}
