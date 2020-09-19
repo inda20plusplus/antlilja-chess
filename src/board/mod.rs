@@ -105,6 +105,14 @@ impl Board {
                 board.move_piece(from, to);
                 board.set_pos(to, TaggedPiece::new(r#type, color));
             }
+            Move::EnPassant(to) => {
+                let dir = if color == Color::White { -1 } else { 1 };
+                board.move_piece(from, to);
+
+                let (x, y) = to.to_xy();
+                let remove_pos = Pos::from_xy(x, (y as i8 + dir) as u8);
+                board.set_pos(remove_pos, TaggedPiece::empty());
+            }
             _ => panic!("Unimplemented move {:?}", r#move),
         }
 
