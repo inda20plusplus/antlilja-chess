@@ -105,7 +105,7 @@ impl Board {
                 board.move_piece(from, to);
                 board.set_pos(to, TaggedPiece::new(r#type, color));
             }
-            _ => {}
+            _ => panic!("Unimplemented move {:?}", r#move),
         }
 
         return board;
