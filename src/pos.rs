@@ -3,25 +3,25 @@ pub struct Pos(u8);
 
 impl Pos {
     pub fn new_xy(x: u8, y: u8) -> Self {
-        return Pos { 0: x | (y << 3) };
+        Pos { 0: x | (y << 3) }
     }
 
     pub fn new_index(i: u8) -> Self {
-        return Self { 0: i };
+        Self { 0: i }
     }
 
     pub fn index(&self) -> usize {
-        return self.0 as usize;
+        self.0 as usize
     }
 
     pub fn xy(&self) -> (u8, u8) {
-        return (self.0 & 0b111, self.0 >> 3);
+        (self.0 & 0b111, self.0 >> 3)
     }
 }
 
 impl std::fmt::Debug for Pos {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "{:?}", self.xy());
+        write!(f, "{:?}", self.xy())
     }
 }
 
