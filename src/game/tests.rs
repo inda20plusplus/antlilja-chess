@@ -6,10 +6,10 @@ fn pawn_moves_new_board() {
 
     let check_side = |game: &mut Game, y_start, y_dir: i8| {
         for x in 0..8 {
-            let correct_moves = MoveArray::from_slice(&[
+            let correct_moves = [
                 Move::move_xy(x, (y_start as i8 + y_dir) as u8),
                 Move::move_xy(x, (y_start as i8 + y_dir * 2) as u8),
-            ]);
+            ];
 
             assert_eq!(game.get_moves_for(x, y_start).unwrap(), &correct_moves);
         }
@@ -37,8 +37,7 @@ fn knight_moves_new_board() {
     let mut game = Game::new();
 
     let check = |game: &Game, x, y, end_y| {
-        let correct_moves =
-            MoveArray::from_slice(&[Move::move_xy(x + 1, end_y), Move::move_xy(x - 1, end_y)]);
+        let correct_moves = [Move::move_xy(x + 1, end_y), Move::move_xy(x - 1, end_y)];
 
         assert_eq!(game.get_moves_for(x, y).unwrap(), &correct_moves);
     };
@@ -97,13 +96,11 @@ fn test_with_whole_game() {
 
     for (i, str_move) in moves.enumerate() {
         let ((x, y), actual_move) = game.parse_pgn_move(str_move);
-        if actual_move == Move::None {
-            println!("{}", str_move);
-        }
         assert_ne!(actual_move, Move::None);
 
         let result = game.play(x, y, actual_move);
         if result == Result::Checkmate {
+            println!("{}", str_move);
             assert_eq!(game.current_color(), Color::Black);
             assert_eq!(i, 68);
             break;

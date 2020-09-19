@@ -1,136 +1,152 @@
 use crate::{Move, Pos};
 
-const MOVE_ARRAY_SIZE: usize = 28;
+const MAX_ROOK_MOVES: usize = 14;
+const MAX_KNIGHT_MOVES: usize = 8;
+const MAX_BISHOP_MOVES: usize = 13;
+const MAX_KING_MOVES: usize = 8;
+const MAX_QUEEN_MOVES: usize = MAX_ROOK_MOVES + MAX_BISHOP_MOVES;
+
+const MAX_MOVES: usize = MAX_ROOK_MOVES * 2
+    + MAX_BISHOP_MOVES * 2
+    + MAX_KNIGHT_MOVES * 2
+    + MAX_QUEEN_MOVES * 9
+    + MAX_KING_MOVES;
+
+const MAX_PIECES: usize = 16;
 
 #[derive(Copy, Clone)]
-pub struct MoveArray {
-    size_uninit: u8,
-    data: [Move; MOVE_ARRAY_SIZE],
+struct PieceMoves {
+    stack_index: u8,
+    len: u8,
+    board_index: u8,
 }
 
-impl PartialEq for MoveArray {
-    fn eq(&self, other: &Self) -> bool {
-        if self.size_uninit != other.size_uninit {
-            return false;
-        }
-
-        for i in 0..self.size() {
-            if !self.data.contains(&other.at(i)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-}
-
-impl MoveArray {
-    pub fn uninitalized() -> Self {
-        return MoveArray {
-            size_uninit: 128,
-            data: [Move::None; MOVE_ARRAY_SIZE],
-        };
-    }
-
+impl PieceMoves {
     pub fn empty() -> Self {
-        return MoveArray {
-            size_uninit: 0,
-            data: [Move::None; MOVE_ARRAY_SIZE],
-        };
-    }
-
-    pub fn from_slice(slice: &[Move]) -> Self {
-        let mut arr = Self::empty();
-
-        arr.size_uninit = slice.len() as u8;
-        for i in 0..slice.len() {
-            arr.data[i] = slice[i];
+        PieceMoves {
+            stack_index: 0,
+            len: 0,
+            board_index: 128,
         }
-
-        return arr;
     }
 
-    pub fn is_empty(&self) -> bool {
-        return self.size() == 0;
-    }
-
-    pub fn is_initalized(&self) -> bool {
-        return (self.size_uninit & 128) == 0;
-    }
-
-    pub fn size(&self) -> usize {
-        return (self.size_uninit & 127) as usize;
-    }
-
-    pub fn at(&self, index: usize) -> Move {
-        return self.data[index];
-    }
-
-    pub fn exists(&self, r#move: Move) -> bool {
-        for m in self.data.iter() {
-            if &r#move == m {
-                return true;
-            }
+    pub fn new(stack_index: u8, board_index: u8) -> Self {
+        PieceMoves {
+            stack_index: stack_index,
+            len: 0,
+            board_index: board_index,
         }
-        return false;
     }
 
-    pub fn find(&self, r#move: Move) -> Option<usize> {
-        for (i, m) in self.data.iter().enumerate() {
-            if &r#move == m {
-                return Some(i);
-            }
-        }
-
-        return None;
+    pub fn is_unused(&self) -> bool {
+        self.board_index == 128
     }
 
-    pub fn push(&mut self, r#move: Move) {
-        assert_ne!(self.size(), MOVE_ARRAY_SIZE);
-
-        self.data[self.size()] = r#move;
-        self.size_uninit += 1;
+    pub fn stack_index(&self) -> usize {
+        self.stack_index as usize
     }
-}
 
-impl std::fmt::Debug for MoveArray {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[").unwrap();
-        for i in 0..self.size() {
-            write!(f, "{:?}", self.at(i)).unwrap();
-            if i != self.size() - 1 {
-                write!(f, ", ").unwrap();
-            }
-        }
+    pub fn len(&self) -> usize {
+        self.len as usize
+    }
 
-        return write!(f, "]");
+    pub fn board_index(&self) -> u8 {
+        self.board_index
+    }
+
+    pub fn increment_len(&mut self) {
+        self.len += 1;
     }
 }
 
 pub struct MoveMap {
-    moves: [MoveArray; 64],
+    moves: [Move; MAX_MOVES],
+    pieces: [PieceMoves; MAX_PIECES],
+    current_stack_index: usize,
+    current_piece_index: usize,
 }
 
 impl MoveMap {
     pub fn new() -> Self {
-        return MoveMap {
-            moves: [MoveArray::uninitalized(); 64],
-        };
+        MoveMap {
+            moves: [Move::None; MAX_MOVES],
+            pieces: [PieceMoves::empty(); MAX_PIECES],
+            current_stack_index: 0,
+            current_piece_index: 0,
+        }
     }
 
-    pub fn insert(&mut self, pos: Pos, array: MoveArray) -> &MoveArray {
-        let index = pos.as_index();
-        self.moves[index] = array;
-        return &self.moves[index];
+    fn find_new_index(&self, board_index: usize) -> usize {
+        let mut index = board_index % MAX_PIECES;
+        loop {
+            if self.pieces[index].is_unused() {
+                return index;
+            }
+
+            if index == 15 {
+                index = 0;
+            } else {
+                index += 1;
+            }
+        }
     }
 
-    pub fn at(&self, pos: Pos) -> &MoveArray {
-        return &self.moves[pos.as_index()];
+    fn find_used_index(&self, board_index: usize) -> Option<usize> {
+        let mut index = board_index % MAX_PIECES;
+        let start = index;
+        loop {
+            if self.pieces[index].board_index() == board_index as u8 {
+                return Some(index);
+            }
+
+            if self.pieces[index].is_unused() {
+                return None;
+            }
+
+            if index == 15 {
+                index = 0;
+            } else {
+                index += 1;
+            }
+
+            if index == start {
+                return None;
+            }
+        }
+    }
+
+    pub fn current_pos_moves_len(&self) -> usize {
+        self.pieces[self.current_piece_index].len()
+    }
+
+    pub fn at(&self, pos: Pos) -> Option<&[Move]> {
+        let index = self.find_used_index(pos.as_index());
+
+        if index.is_none() {
+            return None;
+        }
+
+        let index = index.unwrap();
+        let moves = self.pieces[index];
+        let len = moves.len() + moves.stack_index();
+        Some(&self.moves[moves.stack_index()..len])
+    }
+
+    pub fn set_current_pos(&mut self, pos: Pos) {
+        let board_index = pos.as_index();
+        self.current_piece_index = self.find_new_index(board_index);
+        self.pieces[self.current_piece_index] =
+            PieceMoves::new(self.current_stack_index as u8, board_index as u8);
+    }
+
+    pub fn insert(&mut self, r#move: Move) {
+        self.moves[self.current_stack_index] = r#move;
+        self.current_stack_index += 1;
+        self.pieces[self.current_piece_index].increment_len();
     }
 
     pub fn clear(&mut self) {
-        for i in 0..64 {
-            self.moves[i] = MoveArray::uninitalized();
-        }
+        self.current_stack_index = 0;
+        self.pieces = [PieceMoves::empty(); MAX_PIECES];
     }
 }

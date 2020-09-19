@@ -100,7 +100,7 @@ impl Game {
                     {
                         let (from_x, from_y) = Pos::from_index(i as u8).to_xy();
                         let moves = self.get_moves_for(from_x, from_y);
-                        if moves.is_some() && moves.unwrap().exists(r#move) {
+                        if moves.is_some() && moves.unwrap().contains(&r#move) {
                             return ((from_x, from_y), r#move);
                         }
                     }
@@ -116,7 +116,7 @@ impl Game {
                         && space.get_type() == piece
                     {
                         let moves = self.get_moves_for(from_x, from_y);
-                        if moves.is_some() && moves.unwrap().exists(r#move) {
+                        if moves.is_some() && moves.unwrap().contains(&r#move) {
                             return ((from_x, from_y), r#move);
                         }
                     }
@@ -132,7 +132,7 @@ impl Game {
                         && space.get_type() == piece
                     {
                         let moves = self.get_moves_for(from_x, from_y);
-                        if moves.is_some() && moves.unwrap().exists(r#move) {
+                        if moves.is_some() && moves.unwrap().contains(&r#move) {
                             return ((from_x, from_y), r#move);
                         }
                     }

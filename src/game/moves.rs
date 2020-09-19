@@ -1,54 +1,42 @@
 mod inner {
-    use crate::{Color, Game, Move, MoveArray, PieceType, Pos, TaggedPiece};
+    use crate::{Color, Game, Move, PieceType, Pos, TaggedPiece};
     impl Game {
-        pub fn add_pawn_moves(&self, buffer: &mut MoveArray, x: u8, y: u8) {
+        pub fn add_pawn_moves(&mut self, x: u8, y: u8) {
             let dir: i8 = if self.color == Color::White { 1 } else { -1 };
             let from = Pos::from_xy(x, y);
-
-            let mut add_move = |r#move| {
-                buffer.push(r#move);
-            };
-
-            let is_safe_move = |r#move| {
-                let board_after_move = self.board.board_after_move(from, r#move, self.color);
-                return !board_after_move.pos_in_danger(
-                    self.king_pos.0,
-                    self.king_pos.1,
-                    self.color,
-                );
-            };
+            let color = self.color;
 
             let y_forward = (y as i8 + dir) as u8;
             if self.at_xy(x, y_forward).is_empty() {
                 let to = Pos::from_xy(x, y_forward);
-
+                
                 // Promotion
                 if y_forward == 0 || y_forward == 7 {
                     let r#move = Move::PawnPromotion(PieceType::Queen, to);
-
-                    if is_safe_move(r#move) {
-                        add_move(r#move);
-                        add_move(Move::PawnPromotion(PieceType::Knight, to));
-                        add_move(Move::PawnPromotion(PieceType::Bishop, to));
-                        add_move(Move::PawnPromotion(PieceType::Rook, to));
+                    
+                    if !self.king_in_danger_after_move(from, r#move) {
+                        self.move_map.insert(r#move);
+                        self.move_map.insert(Move::PawnPromotion(PieceType::Knight, to));
+                        self.move_map.insert(Move::PawnPromotion(PieceType::Bishop, to));
+                        self.move_map.insert(Move::PawnPromotion(PieceType::Rook, to));
                     }
                 }
                 // Standard forward
                 else {
                     let r#move = Move::Move(to);
-                    if is_safe_move(r#move) {
-                        buffer.push(r#move);
+                    if !self.king_in_danger_after_move(from, r#move) {
+                        self.move_map.insert(r#move);
                     }
                 }
 
                 // First move, double forward
-                if (y == 1 && self.color == Color::White) || (y == 6 && self.color == Color::Black)
+                if (y == 1 && color == Color::White) || (y == 6 && color == Color::Black)
                 {
                     let y_off = y as i8 + dir * 2;
                     if (0..8).contains(&y_off) && self.at_xy(x, y_off as u8).is_empty() {
                         let r#move = Move::move_xy(x, y_off as u8);
-                        if is_safe_move(r#move) {
-                            buffer.push(r#move);
+                        if !self.king_in_danger_after_move(from, r#move) {
+                            self.move_map.insert(r#move);
                         }
                     }
                 }
@@ -65,19 +53,27 @@ mod inner {
                 } 
                 // En passant
                 else if last.is_some() {
-                    let (from_x, from_y) = last.unwrap().0.to_xy();
-                    if from_x != x && y != (from_y as i8 + (dir * -1)) as u8 {
-                        Move::EnPassant(Pos::from_xy(x, y))
-                    } else {
-                        Move::None
+                    let (last_from, last_move) = last.unwrap();
+                    let mut r#move = Move::None;
+                    
+                    if let Move::Move(to_pos) = last_move {
+                        let (from_x, from_y) = last_from.to_xy();
+                        let (_, to_y) = to_pos.to_xy();
+                        if (from_y as i8 - to_y as i8).abs() == 2 
+                            && from_x == x 
+                            && y == (from_y as i8 + (dir * -1)) as u8 
+                        {
+                            r#move = Move::EnPassant(Pos::from_xy(x, y));
+                        }
                     }
+                    r#move
                 }
                 else {
                     Move::None
                 };
 
-                if r#move != Move::None && is_safe_move(r#move) {
-                    buffer.push(r#move);
+                if r#move != Move::None && !self.king_in_danger_after_move(from, r#move) {
+                    self.move_map.insert(r#move);
                 }
             };
 
@@ -90,7 +86,7 @@ mod inner {
             }
         }
 
-        pub fn add_straight_moves(&self, moves: &mut MoveArray, x: u8, y: u8) {
+        pub fn add_straight_moves(&mut self, x: u8, y: u8) {
             let from = Pos::from_xy(x, y);
 
             let mut loop_internal = |x, y| {
@@ -98,7 +94,7 @@ mod inner {
                 if space.is_empty() || space.get_color() != self.color {
                     let r#move = Move::move_xy(x, y);
                     if !self.king_in_danger_after_move(from, r#move) {
-                        moves.push(r#move);
+                        self.move_map.insert(r#move);
                     }
                 }
                 
@@ -134,7 +130,7 @@ mod inner {
             }
         }
 
-        pub fn add_diagonal_moves(&self, moves: &mut MoveArray, x: u8, y: u8) {
+        pub fn add_diagonal_moves(&mut self, x: u8, y: u8) {
             use std::cmp::min;
 
             let from = Pos::from_xy(x, y);
@@ -147,7 +143,7 @@ mod inner {
                     if piece.is_empty() || piece.get_color() != self.color {
                         let r#move = Move::move_xy(x, y);
                         if !self.king_in_danger_after_move(from, r#move) {
-                            moves.push(r#move);
+                            self.move_map.insert(r#move);
                         }
                     }
 
@@ -170,7 +166,7 @@ mod inner {
             check(-1, 1, min(x, 8 - y));
         }
 
-        pub fn add_knight_moves(&self, moves: &mut MoveArray, x: u8, y: u8) {
+        pub fn add_knight_moves(&mut self, x: u8, y: u8) {
             let from = Pos::from_xy(x, y);
 
             let mut add_move = |x_dir: i8, y_dir: i8| {
@@ -182,7 +178,7 @@ mod inner {
                         if piece.is_empty() || piece.get_color() != self.color {
                             let r#move = Move::move_xy(x, y);
                             if !self.king_in_danger_after_move(from, r#move) {
-                                moves.push(r#move);
+                                self.move_map.insert(r#move);
                             }
                         }
                     };
@@ -198,7 +194,7 @@ mod inner {
             add_move(-1, 1);
         }
 
-        pub fn add_king_moves(&self, moves: &mut MoveArray, x: u8, y: u8) {
+        pub fn add_king_moves(&mut self, x: u8, y: u8) {
             let from = Pos::from_xy(x, y);
 
             let mut check = |x_dir: i8, y_dir: i8| {
@@ -216,7 +212,7 @@ mod inner {
                         let board_after_move = self.board.board_after_move(from, r#move, self.color);
                         
                         if !board_after_move.pos_in_danger(x, y, self.color) {
-                            moves.push(r#move);
+                            self.move_map.insert(r#move);
                         }
                     }
                 }
@@ -232,7 +228,7 @@ mod inner {
             check(1, -1);
         }
 
-        pub fn add_castling_moves(&self, buffer: &mut MoveArray) {
+        pub fn add_castling_moves(&mut self) {
             let y = if self.color == Color::White { 0 } else { 7 };
             let king_pos = Pos::from_xy(4, y);
 
@@ -272,7 +268,7 @@ mod inner {
 
             let board_with_move = self.board.board_after_move(king_pos, r#move, self.color);
             if !board_with_move.pos_in_danger(king_x, y, self.color) {
-                buffer.push(r#move);
+                self.move_map.insert(r#move);
             }
         }
     }

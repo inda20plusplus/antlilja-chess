@@ -1,4 +1,4 @@
-use crate::{Board, Color, Move, MoveArray, MoveMap, PieceType, Pos, TaggedPiece};
+use crate::{Board, Color, Move, MoveMap, PieceType, Pos, TaggedPiece};
 
 mod moves;
 mod pgn;
@@ -56,12 +56,22 @@ impl Game {
     pub fn play(&mut self, x: u8, y: u8, r#move: Move) -> Result {
         let pos = Pos::from_xy(x, y);
 
+        if r#move == Move::None {
+            return Result::InvalidMove;
+        }
+
         assert!(pos.as_index() < 64);
         assert!(!self.at_pos(pos).is_empty());
 
         let moves = self.move_map.at(pos);
 
-        if !moves.exists(r#move) {
+        if moves.is_none() {
+            return Result::InvalidMove;
+        }
+
+        let moves = moves.unwrap();
+
+        if !moves.contains(&r#move) {
             return Result::InvalidMove;
         }
 
@@ -101,8 +111,8 @@ impl Game {
         for y in 0..8 {
             for x in 0..8 {
                 moves += self.calculate_moves_for(x, y);
-                }
             }
+        }
 
         return moves == 0;
     }
@@ -115,46 +125,40 @@ impl Game {
             return 0;
         }
 
-        let mut moves = MoveArray::empty();
+        self.move_map.set_current_pos(pos);
 
         match piece.get_type() {
             PieceType::Pawn => {
-                self.add_pawn_moves(&mut moves, x, y);
+                self.add_pawn_moves(x, y);
             }
             PieceType::Rook => {
-                self.add_straight_moves(&mut moves, x, y);
+                self.add_straight_moves(x, y);
             }
             PieceType::Knight => {
-                self.add_knight_moves(&mut moves, x, y);
+                self.add_knight_moves(x, y);
             }
             PieceType::Bishop => {
-                self.add_diagonal_moves(&mut moves, x, y);
+                self.add_diagonal_moves(x, y);
             }
             PieceType::Queen => {
-                self.add_diagonal_moves(&mut moves, x, y);
-                self.add_straight_moves(&mut moves, x, y);
+                self.add_diagonal_moves(x, y);
+                self.add_straight_moves(x, y);
             }
             PieceType::King => {
-                self.add_king_moves(&mut moves, x, y);
-                self.add_castling_moves(&mut moves);
+                self.add_king_moves(x, y);
+                self.add_castling_moves();
             }
             _ => {
                 return 0;
             }
         };
 
-        self.move_map.insert(pos, moves);
-        return moves.size();
+        return self.move_map.current_pos_moves_len();
     }
 
-    pub fn get_moves_for(&self, x: u8, y: u8) -> Option<&MoveArray> {
+    pub fn get_moves_for(&self, x: u8, y: u8) -> Option<&[Move]> {
         let pos = Pos::from_xy(x, y);
-
-        if self.at_pos(pos).is_empty() {
-            return None;
-        }
-
-        return Some(&self.move_map.at(pos));
+        return self.move_map.at(pos);
     }
 
     pub fn print_ascii(&self) {

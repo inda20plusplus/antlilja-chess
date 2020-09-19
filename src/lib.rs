@@ -9,7 +9,8 @@ pub mod pos;
 pub use board::Board;
 pub use color::Color;
 pub use game::{Game, Result};
-pub use move_map::{MoveArray, MoveMap};
 pub use piece::{PieceType, TaggedPiece};
 pub use pos::Pos;
 pub use r#move::Move;
+
+use move_map::MoveMap;
