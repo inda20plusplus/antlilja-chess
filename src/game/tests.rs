@@ -12,7 +12,7 @@ fn pawn_moves_new_board() {
                 Move::Move(from.move_y_non_fail(y_dir * 2)),
             ];
 
-            assert_eq!(game.get_moves_for(from).unwrap(), &correct_moves);
+            assert_eq!(game.moves_for_pos(from).unwrap(), &correct_moves);
         }
     };
 
@@ -25,12 +25,12 @@ fn pawn_moves_new_board() {
 fn rook_moves_new_board() {
     let mut game = Game::new();
 
-    assert!(game.get_moves_for(Pos::new_xy(0, 0)).unwrap().is_empty());
-    assert!(game.get_moves_for(Pos::new_xy(7, 0)).unwrap().is_empty());
+    assert!(game.moves_for_pos(Pos::new_xy(0, 0)).unwrap().is_empty());
+    assert!(game.moves_for_pos(Pos::new_xy(7, 0)).unwrap().is_empty());
 
     game.switch_side();
-    assert!(game.get_moves_for(Pos::new_xy(0, 7)).unwrap().is_empty());
-    assert!(game.get_moves_for(Pos::new_xy(7, 7)).unwrap().is_empty());
+    assert!(game.moves_for_pos(Pos::new_xy(0, 7)).unwrap().is_empty());
+    assert!(game.moves_for_pos(Pos::new_xy(7, 7)).unwrap().is_empty());
 }
 
 #[test]
@@ -41,7 +41,7 @@ fn knight_moves_new_board() {
         let move_pos = Pos::new_xy(pos.x(), end_y);
         let correct_moves = [Move::Move(move_pos.add_x(1)), Move::Move(move_pos.sub_x(1))];
 
-        assert_eq!(game.get_moves_for(pos).unwrap(), &correct_moves);
+        assert_eq!(game.moves_for_pos(pos).unwrap(), &correct_moves);
     };
 
     check(&game, Pos::new_xy(1, 0), 2);
@@ -57,32 +57,32 @@ fn knight_moves_new_board() {
 fn bishop_moves_new_board() {
     let mut game = Game::new();
 
-    assert!(game.get_moves_for(Pos::new_xy(2, 0)).unwrap().is_empty());
-    assert!(game.get_moves_for(Pos::new_xy(5, 0)).unwrap().is_empty());
+    assert!(game.moves_for_pos(Pos::new_xy(2, 0)).unwrap().is_empty());
+    assert!(game.moves_for_pos(Pos::new_xy(5, 0)).unwrap().is_empty());
 
     game.switch_side();
-    assert!(game.get_moves_for(Pos::new_xy(2, 7)).unwrap().is_empty());
-    assert!(game.get_moves_for(Pos::new_xy(5, 7)).unwrap().is_empty());
+    assert!(game.moves_for_pos(Pos::new_xy(2, 7)).unwrap().is_empty());
+    assert!(game.moves_for_pos(Pos::new_xy(5, 7)).unwrap().is_empty());
 }
 
 #[test]
 fn queen_moves_new_board() {
     let mut game = Game::new();
 
-    assert!(game.get_moves_for(Pos::new_xy(3, 0)).unwrap().is_empty());
+    assert!(game.moves_for_pos(Pos::new_xy(3, 0)).unwrap().is_empty());
 
     game.switch_side();
-    assert!(game.get_moves_for(Pos::new_xy(3, 7)).unwrap().is_empty());
+    assert!(game.moves_for_pos(Pos::new_xy(3, 7)).unwrap().is_empty());
 }
 
 #[test]
 fn king_moves_new_board() {
     let mut game = Game::new();
 
-    assert!(game.get_moves_for(Pos::new_xy(4, 0)).unwrap().is_empty());
+    assert!(game.moves_for_pos(Pos::new_xy(4, 0)).unwrap().is_empty());
 
     game.switch_side();
-    assert!(game.get_moves_for(Pos::new_xy(4, 7)).unwrap().is_empty());
+    assert!(game.moves_for_pos(Pos::new_xy(4, 7)).unwrap().is_empty());
 }
 
 #[test]

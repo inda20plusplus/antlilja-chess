@@ -101,7 +101,7 @@ impl Game {
                     if !space.is_empty() && space.color() == self.color && space.get_type() == piece
                     {
                         let from = Pos::new_index(i as u8);
-                        if let Some(moves) = self.get_moves_for(from) {
+                        if let Some(moves) = self.moves_for_pos(from) {
                             if moves.contains(&move_move) {
                                 return (from, move_move);
                             }
@@ -123,7 +123,7 @@ impl Game {
                     let space = self.at_pos(from);
                     if !space.is_empty() && space.color() == self.color && space.get_type() == piece
                     {
-                        if let Some(moves) = self.get_moves_for(from) {
+                        if let Some(moves) = self.moves_for_pos(from) {
                             if moves.contains(&move_move) {
                                 return (from, move_move);
                             }
@@ -145,7 +145,7 @@ impl Game {
                     let space = self.at_pos(from);
                     if !space.is_empty() && space.color() == self.color && space.get_type() == piece
                     {
-                        if let Some(moves) = self.get_moves_for(from) {
+                        if let Some(moves) = self.moves_for_pos(from) {
                             if moves.contains(&move_move) {
                                 return (from, move_move);
                             }

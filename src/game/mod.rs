@@ -150,7 +150,7 @@ impl Game {
         return self.move_map.current_pos_moves_len();
     }
 
-    pub fn get_moves_for(&self, pos: Pos) -> Option<&[Move]> {
+    pub fn moves_for_pos(&self, pos: Pos) -> Option<&[Move]> {
         return self.move_map.at(pos);
     }
 
