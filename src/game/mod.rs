@@ -106,6 +106,15 @@ impl Game {
         &self.board
     }
 
+    pub fn history(&self, steps: usize) -> &(Board, Pos, Move) {
+        assert!(steps < self.history.len());
+        &self.history[self.history.len() - 1 - steps]
+    }
+
+    pub fn history_len(&self) -> usize {
+        self.history.len()
+    }
+
     fn calculate_all_moves(&mut self) -> bool {
         let mut moves: usize = 0;
         for i in 0..64 {
