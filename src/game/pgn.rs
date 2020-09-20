@@ -81,14 +81,14 @@ impl Game {
 
         if pmove == "O-O" {
             return (
-                Pos::new_index(if self.color == Color::White { 4 } else { 60 }),
+                Pos::new_index(if self.player == Color::White { 4 } else { 60 }),
                 Move::KingSideCastling,
             );
         }
 
         if pmove == "O-O-O" {
             return (
-                Pos::new_index(if self.color == Color::White { 4 } else { 60 }),
+                Pos::new_index(if self.player == Color::White { 4 } else { 60 }),
                 Move::QueenSideCastling,
             );
         }
@@ -102,7 +102,7 @@ impl Game {
                     for i in 0..64 {
                         let space = self.at_index(i);
                         if !space.is_empty()
-                            && space.color() == self.color
+                            && space.color() == self.player
                             && space.get_type() == piece
                         {
                             let from = Pos::new_index(i as u8);
@@ -127,7 +127,7 @@ impl Game {
                         let from = Pos::new_xy(from_x, from_y);
                         let space = self.at_pos(from);
                         if !space.is_empty()
-                            && space.color() == self.color
+                            && space.color() == self.player
                             && space.get_type() == piece
                         {
                             if let Some(moves) = self.moves_for_pos(from) {
@@ -151,7 +151,7 @@ impl Game {
                         let from = Pos::new_xy(from_x, from_y);
                         let space = self.at_pos(from);
                         if !space.is_empty()
-                            && space.color() == self.color
+                            && space.color() == self.player
                             && space.get_type() == piece
                         {
                             if let Some(moves) = self.moves_for_pos(from) {
@@ -168,7 +168,7 @@ impl Game {
                     return INVALID;
                 }
                 [Token::File(x), Token::Rank(y), Token::Promotion, Token::Piece(piece)] => {
-                    let dir: i8 = if self.color == Color::White { -1 } else { 1 };
+                    let dir: i8 = if self.player == Color::White { -1 } else { 1 };
                     let from = Pos::new_xy(x, y).move_y_non_fail(dir);
                     return (from, Move::PawnPromotion(piece, Pos::new_xy(x, y)));
                 }

@@ -2,7 +2,7 @@ mod inner {
     use crate::{Color, Game, Move, PieceType, Pos, TaggedPiece};
     impl Game {
         pub fn add_pawn_moves(&mut self, from: Pos) {
-            let y_dir: i8 = if self.color == Color::White { 1 } else { -1 };
+            let y_dir: i8 = if self.player == Color::White { 1 } else { -1 };
             
             if let Some(to) = from.move_y(y_dir)  {
                 if self.at_pos(to).is_empty() {
@@ -28,7 +28,7 @@ mod inner {
             }
 
             // First move, double forward
-            if from.at_pawn_rank(self.color) {
+            if from.at_pawn_rank(self.player) {
                 if let Some(to) = from.move_y(y_dir * 2) {
                     if self.at_pos(to).is_empty() {
                         let r#move = Move::Move(to);
@@ -44,7 +44,7 @@ mod inner {
 
                 let r#move = 
                 // Standard diagonal pawn take
-                if !space.is_empty() && space.color() != self.color {
+                if !space.is_empty() && space.color() != self.player {
                     Move::Move(to)
                 } 
                 // En passant
@@ -80,7 +80,7 @@ mod inner {
         pub fn add_straight_moves(&mut self, from: Pos) {
             let mut loop_internal = |to| {
                 let space = self.board.at_pos(to);
-                if space.is_empty() || space.color() != self.color {
+                if space.is_empty() || space.color() != self.player {
                     let r#move = Move::Move(to);
                     if !self.king_in_danger_after_move(from, r#move) {
                         self.move_map.insert(r#move);
@@ -130,7 +130,7 @@ mod inner {
                     let to = from.move_xy_non_fail(off * x_dir, off * y_dir);
                     let piece = self.at_pos(to);
 
-                    if piece.is_empty() || piece.color() != self.color {
+                    if piece.is_empty() || piece.color() != self.player {
                         let r#move = Move::Move(to);
                         if !self.king_in_danger_after_move(from, r#move) {
                             self.move_map.insert(r#move);
@@ -160,7 +160,7 @@ mod inner {
             let mut add_move = |x_dir: i8, y_dir: i8| {
                 let mut add = |to| {
                     let piece = self.at_pos(to);
-                    if piece.is_empty() || piece.color() != self.color {
+                    if piece.is_empty() || piece.color() != self.player {
                         let r#move = Move::Move(to);
                         if !self.king_in_danger_after_move(from, r#move) {
                             self.move_map.insert(r#move);
@@ -189,11 +189,11 @@ mod inner {
                 if let Some(to) = from.move_xy(x_dir, y_dir) {
                     let piece = self.at_pos(to);
                     
-                    if piece.is_empty() || piece.color() != self.color {
+                    if piece.is_empty() || piece.color() != self.player {
                         let r#move = Move::Move(to);   
-                        let board_after_move = self.board.board_after_move(from, r#move, self.color);
+                        let board_after_move = self.board.board_after_move(from, r#move, self.player);
                         
-                        if !board_after_move.pos_in_danger(to, self.color) {
+                        if !board_after_move.pos_in_danger(to, self.player) {
                             self.move_map.insert(r#move);
                         }
                     }
@@ -211,7 +211,7 @@ mod inner {
         }
 
         pub fn add_castling_moves(&mut self) {
-            let y = if self.color == Color::White { 0 } else { 7 };
+            let y = if self.player == Color::White { 0 } else { 7 };
             let king_pos = Pos::new_xy(4, y);
 
             let mut board_without_king = self.board;
@@ -223,7 +223,7 @@ mod inner {
                     return false;
                 }
 
-                if board_without_king.pos_in_danger(to, self.color) {
+                if board_without_king.pos_in_danger(to, self.player) {
                     return false;
                 }
 
@@ -249,9 +249,9 @@ mod inner {
                 return;
             }
 
-            let board_with_move = self.board.board_after_move(king_pos, r#move, self.color);
+            let board_with_move = self.board.board_after_move(king_pos, r#move, self.player);
             let new_king_pos = Pos::new_xy(king_x, y);
-            if !board_with_move.pos_in_danger(new_king_pos, self.color) {
+            if !board_with_move.pos_in_danger(new_king_pos, self.player) {
                 self.move_map.insert(r#move);
             }
         }

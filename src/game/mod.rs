@@ -18,7 +18,7 @@ pub struct Game {
     board: Board,
     move_map: MoveMap,
     history: Vec<(Board, Pos, Move)>,
-    color: Color,
+    player: Color,
     king_pos: Pos,
 }
 
@@ -28,7 +28,7 @@ impl Default for Game {
             board: Default::default(),
             move_map: MoveMap::new(),
             history: Vec::<(Board, Pos, Move)>::with_capacity(50),
-            color: Color::White,
+            player: Color::White,
             king_pos: Pos::new_xy(4, 0),
         };
 
@@ -41,13 +41,13 @@ impl Default for Game {
 impl Game {
     pub fn switch_side(&mut self) -> bool {
         self.move_map.clear();
-        self.color.flip();
-        self.king_pos = self.board.find_king(self.color);
+        self.player.flip();
+        self.king_pos = self.board.find_king(self.player);
         self.calculate_all_moves()
     }
 
     pub fn current_color(&self) -> Color {
-        self.color
+        self.player
     }
 
     pub fn moves_for_pos(&self, pos: Pos) -> Option<&[Move]> {
@@ -55,7 +55,7 @@ impl Game {
     }
 
     pub fn print_ascii(&self) {
-        self.board.print_ascii(self.color);
+        self.board.print_ascii(self.player);
     }
 
     pub fn play(&mut self, from: Pos, r#move: Move) -> Result {
@@ -79,10 +79,10 @@ impl Game {
         }
 
         self.history.push((self.board, from, r#move));
-        self.board = self.board.board_after_move(from, r#move, self.color);
+        self.board = self.board.board_after_move(from, r#move, self.player);
 
         if self.switch_side() {
-            if self.board.pos_in_danger(self.king_pos, self.color) {
+            if self.board.pos_in_danger(self.king_pos, self.player) {
                 Result::Checkmate
             } else {
                 Result::Stalemate
@@ -101,10 +101,10 @@ impl Game {
         self.history.truncate(self.history.len() - steps);
 
         if steps % 2 != 0 {
-            self.color.flip();
+            self.player.flip();
         }
 
-        self.king_pos = self.board.find_king(self.color);
+        self.king_pos = self.board.find_king(self.player);
         let _ = self.calculate_all_moves();
         true
     }
@@ -146,7 +146,7 @@ impl Game {
     fn calculate_moves_for(&mut self, pos: Pos) -> usize {
         let piece = self.at_pos(pos);
 
-        if piece.is_empty() || piece.color() != self.color {
+        if piece.is_empty() || piece.color() != self.player {
             return 0;
         }
 
@@ -179,7 +179,7 @@ impl Game {
     }
 
     fn king_in_danger_after_move(&self, from: Pos, r#move: Move) -> bool {
-        let board_after_move = self.board.board_after_move(from, r#move, self.color);
-        board_after_move.pos_in_danger(self.king_pos, self.color)
+        let board_after_move = self.board.board_after_move(from, r#move, self.player);
+        board_after_move.pos_in_danger(self.king_pos, self.player)
     }
 }
