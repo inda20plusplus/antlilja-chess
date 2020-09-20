@@ -1,4 +1,4 @@
-pub use std::str::FromStr;
+use std::str::FromStr;
 
 use super::{Board, TaggedPiece};
 

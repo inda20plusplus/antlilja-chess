@@ -1,5 +1,7 @@
 use super::*;
 
+use std::str::FromStr;
+
 #[test]
 fn new_board() {
     let board = Board::default();
