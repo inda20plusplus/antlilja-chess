@@ -227,7 +227,7 @@ impl Board {
         let internal_loop = |y| {
             print!("{}| ", y + 1);
             for x in 0..8 {
-                print!("{:?} ", self.at_xy(x, y));
+                print!("{} ", self.at_xy(x, y));
             }
             println!("|");
         };
