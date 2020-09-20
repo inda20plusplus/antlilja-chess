@@ -18,20 +18,20 @@ impl PartialEq for Board {
     }
 }
 
-impl Board {
-    pub fn new() -> Self {
-        let mut data = Self {
+impl Default for Board {
+    fn default() -> Self {
+        let mut board = Self {
             0: [TaggedPiece::empty(); 64],
         };
 
         for i in 0..8 {
-            data.0[8 + i] = TaggedPiece::original(PieceType::Pawn, Color::White);
-            data.0[8 * 6 + i] = TaggedPiece::original(PieceType::Pawn, Color::Black);
+            board.0[8 + i] = TaggedPiece::original(PieceType::Pawn, Color::White);
+            board.0[8 * 6 + i] = TaggedPiece::original(PieceType::Pawn, Color::Black);
         }
 
         let mut place_at_both_sides = |offset, r#type| {
-            data.0[offset] = TaggedPiece::original(r#type, Color::White);
-            data.0[8 * 7 + offset] = TaggedPiece::original(r#type, Color::Black);
+            board.0[offset] = TaggedPiece::original(r#type, Color::White);
+            board.0[8 * 7 + offset] = TaggedPiece::original(r#type, Color::Black);
         };
 
         let mut place_matching_at_both_sides = |offset, r#type| {
@@ -45,9 +45,11 @@ impl Board {
         place_at_both_sides(3, PieceType::Queen);
         place_at_both_sides(4, PieceType::King);
 
-        data
+        board
+    }
     }
 
+impl Board {
     pub fn set_pos(&mut self, pos: Pos, piece: TaggedPiece) {
         self.0[pos.index()] = piece;
     }

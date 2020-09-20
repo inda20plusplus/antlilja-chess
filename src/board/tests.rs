@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 fn new_board() {
-    let board = Board::new();
+    let board = Board::default();
 
     let exists_at_both_sides = |offset, r#type| {
         assert_eq!(

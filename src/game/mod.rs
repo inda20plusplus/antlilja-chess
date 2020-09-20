@@ -25,7 +25,7 @@ pub struct Game {
 impl Game {
     pub fn new() -> Self {
         let mut game = Game {
-            board: Board::new(),
+            board: Default::default(),
             move_map: MoveMap::new(),
             history: Vec::<(Board, Pos, Move)>::with_capacity(50),
             color: Color::White,
