@@ -1,6 +1,7 @@
 use crate::Color;
 
 pub mod debug;
+pub mod display;
 pub mod from_str;
 
 pub use from_str::*;
