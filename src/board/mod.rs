@@ -1,6 +1,9 @@
 use crate::{Color, Move, PieceType, Pos, TaggedPiece};
 
 pub mod debug;
+pub mod from_str;
+
+pub use from_str::*;
 
 #[cfg(test)]
 mod tests;
@@ -49,7 +52,7 @@ impl Default for Board {
 
         board
     }
-    }
+}
 
 impl Board {
     pub fn set_pos(&mut self, pos: Pos, piece: TaggedPiece) {
