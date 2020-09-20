@@ -134,6 +134,10 @@ impl Game {
         self.history.len()
     }
 
+    pub fn history_iter(&self) -> std::slice::Iter<'_, (Board, Pos, Move)> {
+        self.history.iter()
+    }
+
     fn calculate_all_moves(&mut self) -> bool {
         let mut moves: usize = 0;
         for i in 0..64 {
