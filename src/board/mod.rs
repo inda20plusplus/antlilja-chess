@@ -6,6 +6,18 @@ mod tests;
 #[derive(Copy, Clone)]
 pub struct Board([TaggedPiece; 64]);
 
+impl PartialEq for Board {
+    fn eq(&self, other: &Board) -> bool {
+        for i in 0..64 {
+            if self.0[i] != other.0[i] {
+                return false;
+            }
+        }
+
+        true
+    }
+}
+
 impl Board {
     pub fn new() -> Self {
         let mut data = Self {
