@@ -39,6 +39,19 @@ impl Default for Game {
 }
 
 impl Game {
+    pub fn from_board(board: Board, player: Color) -> Self {
+        let mut game = Self {
+            board: board,
+            move_map: MoveMap::new(),
+            history: Vec::with_capacity(50),
+            player: player,
+            king_pos: board.find_king(player),
+        };
+
+        game.calculate_all_moves();
+
+        game
+    }
     pub fn switch_side(&mut self) -> bool {
         self.move_map.clear();
         self.player.flip();
