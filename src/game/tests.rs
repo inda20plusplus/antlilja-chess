@@ -1,5 +1,7 @@
 use super::*;
 
+use std::str::FromStr;
+
 fn compare_moves(lhs: &[Move], rhs: &[Move]) {
     assert_eq!(lhs.len(), rhs.len());
     if !lhs.iter().all(|a| rhs.iter().find(|&b| a == b).is_some()) {
@@ -90,6 +92,134 @@ fn king_moves_new_board() {
 
     game.switch_side();
     assert!(game.moves_for_pos(Pos::new_xy(4, 7)).unwrap().is_empty());
+}
+
+#[test]
+fn test_rook_moves() {
+    const BOARD_STATE: &str = "
+        R* N* B* Q* K* B* N* .
+        P* P* P* P* P* P* P* .
+        .  .  .  .  .  .  .  .
+        .  n  .  .  .  .  .  R
+        p  .  .  .  .  .  .  P
+        r  .  .  .  .  .  .  .
+        .  p* p* p* p* p* p* p*
+        .  . b* q* k* b* n* r*";
+
+    let board = Board::from_str(BOARD_STATE).unwrap();
+    let game = Game::from_board(board, Color::White);
+
+    let correct_moves = [
+        // Horizontal
+        Move::move_xy(6, 3),
+        Move::move_xy(5, 3),
+        Move::move_xy(4, 3),
+        Move::move_xy(3, 3),
+        Move::move_xy(2, 3),
+        Move::move_xy(1, 3),
+        // Vertical
+        Move::move_xy(7, 2),
+        Move::move_xy(7, 1),
+        Move::move_xy(7, 0),
+    ];
+
+    let moves = game.moves_for_pos(Pos::new_xy(7, 3)).unwrap();
+    compare_moves(moves, &correct_moves);
+}
+
+#[test]
+fn test_bishop_moves() {
+    const BOARD_STATE: &str = "
+        R* N* B* Q* K* B* N* R*
+        P* P* P* . P* P* P* P*
+        .  .  .  .  .  .  .  .
+        .  .  .  P  .  .  .  .
+        .  .  .  .  .  .  .  .
+        n  .  .  .  .  .  .  .
+        p* p* p* p* p* p* p* p*
+        r* . b* q* k* b* n* r*";
+
+    let board = Board::from_str(BOARD_STATE).unwrap();
+    let game = Game::from_board(board, Color::White);
+
+    let correct_moves = [
+        Move::move_xy(3, 1),
+        Move::move_xy(4, 2),
+        Move::move_xy(5, 3),
+        Move::move_xy(6, 4),
+        Move::move_xy(7, 5),
+    ];
+
+    let moves = game.moves_for_pos(Pos::new_xy(2, 0)).unwrap();
+    compare_moves(moves, &correct_moves);
+}
+
+#[test]
+fn test_queen_moves() {
+    const BOARD_STATE: &str = "
+        R* N* B* .  K* B* N* R*
+        P* P* P* P* . P* P* P*
+        .  .  .  .  .  .  .  .
+        .  .  .  .  P  .  .  .
+        p  .  .  .  .  .  .  Q
+        r  .  .  .  .  .  .  .
+        .  p* p* p* p* p* p* p*
+        .  n* b* q* k* b* n* r*";
+
+    let board = Board::from_str(BOARD_STATE).unwrap();
+    let game = Game::from_board(board, Color::White);
+
+    let correct_moves = [
+        // Horizontal
+        Move::move_xy(6, 4),
+        Move::move_xy(5, 4),
+        Move::move_xy(4, 4),
+        Move::move_xy(3, 4),
+        Move::move_xy(2, 4),
+        Move::move_xy(1, 4),
+        Move::move_xy(0, 4),
+        // Vertical
+        Move::move_xy(7, 3),
+        Move::move_xy(7, 2),
+        Move::move_xy(7, 5),
+        Move::move_xy(7, 6),
+        // Diag
+        Move::move_xy(6, 5),
+        Move::move_xy(5, 6),
+        Move::move_xy(6, 3),
+        Move::move_xy(5, 2),
+        Move::move_xy(4, 1),
+        Move::move_xy(3, 0),
+    ];
+
+    let moves = game.moves_for_pos(Pos::new_xy(7, 4)).unwrap();
+    compare_moves(moves, &correct_moves)
+}
+
+#[test]
+fn test_king_moves() {
+    const BOARD_STATE: &str = "
+        R* N* B* Q* .  B* N* R*
+        P* P* P* P* K  P* P* P*
+        .  .  .  .  .  .  .  .
+        .  .  .  .  P  .  .  .
+        .  .  .  .  .  .  .  .
+        n  .  .  p  .  .  .  .
+        p* p* p* .  p* p* p* p*
+        r* .  b* q* k* b* n* r*";
+
+    let board = Board::from_str(BOARD_STATE).unwrap();
+    let game = Game::from_board(board, Color::White);
+
+    let correct_moves = [
+        Move::move_xy(4, 0),
+        Move::move_xy(3, 2),
+        Move::move_xy(5, 2),
+        Move::move_xy(4, 2),
+    ];
+
+    let moves = game.moves_for_pos(Pos::new_xy(4, 1)).unwrap();
+    compare_moves(moves, &correct_moves);
 }
 
 #[test]
