@@ -47,3 +47,49 @@ fn get_color() {
     color_persists(PieceType::Queen);
     color_persists(PieceType::King);
 }
+
+#[test]
+fn from_str() {
+    fn test_original(s: &str, piece: PieceType) {
+        assert_eq!(
+            TaggedPiece::from_str(s).ok().unwrap(),
+            TaggedPiece::original(piece, Color::White)
+        );
+
+        assert_eq!(
+            TaggedPiece::from_str(&s.to_ascii_lowercase()).ok().unwrap(),
+            TaggedPiece::original(piece, Color::Black)
+        );
+    }
+
+    fn test_non_original(s: &str, piece: PieceType) {
+        assert_eq!(
+            TaggedPiece::from_str(s).ok().unwrap(),
+            TaggedPiece::new(piece, Color::White)
+        );
+
+        assert_eq!(
+            TaggedPiece::from_str(&s.to_ascii_lowercase()).ok().unwrap(),
+            TaggedPiece::new(piece, Color::Black)
+        );
+    }
+
+    assert_eq!(
+        TaggedPiece::from_str(".").ok().unwrap(),
+        TaggedPiece::empty()
+    );
+
+    test_original("P*", PieceType::Pawn);
+    test_original("R*", PieceType::Rook);
+    test_original("N*", PieceType::Knight);
+    test_original("B*", PieceType::Bishop);
+    test_original("Q*", PieceType::Queen);
+    test_original("K*", PieceType::King);
+
+    test_non_original("P", PieceType::Pawn);
+    test_non_original("R", PieceType::Rook);
+    test_non_original("N", PieceType::Knight);
+    test_non_original("B", PieceType::Bishop);
+    test_non_original("Q", PieceType::Queen);
+    test_non_original("K", PieceType::King);
+}

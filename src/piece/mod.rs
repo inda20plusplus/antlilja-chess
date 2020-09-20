@@ -1,6 +1,9 @@
 use crate::Color;
 
 pub mod debug;
+pub mod from_str;
+
+pub use from_str::*;
 
 #[cfg(test)]
 mod tests;
@@ -29,6 +32,7 @@ impl PieceType {
         }
     }
 }
+
 #[derive(Copy, Clone)]
 pub struct TaggedPiece(u8);
 
