@@ -14,6 +14,19 @@ pub enum PieceType {
     King = 6,
 }
 
+impl PieceType {
+    pub fn from_char(c: char) -> Option<Self> {
+        match c {
+            'P' => Some(PieceType::Pawn),
+            'R' => Some(PieceType::Rook),
+            'N' => Some(PieceType::Knight),
+            'B' => Some(PieceType::Bishop),
+            'Q' => Some(PieceType::Queen),
+            'K' => Some(PieceType::King),
+            _ => None,
+        }
+    }
+}
 #[derive(Copy, Clone)]
 pub struct TaggedPiece(u8);
 
