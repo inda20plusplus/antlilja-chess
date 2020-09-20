@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 fn pawn_moves_new_board() {
-    let mut game = Game::new();
+    let mut game = Game::default();
 
     let check_side = |game: &mut Game, y_start: u8, y_dir: i8| {
         for x in 0..8 {
@@ -23,7 +23,7 @@ fn pawn_moves_new_board() {
 
 #[test]
 fn rook_moves_new_board() {
-    let mut game = Game::new();
+    let mut game = Game::default();
 
     assert!(game.moves_for_pos(Pos::new_xy(0, 0)).unwrap().is_empty());
     assert!(game.moves_for_pos(Pos::new_xy(7, 0)).unwrap().is_empty());
@@ -35,7 +35,7 @@ fn rook_moves_new_board() {
 
 #[test]
 fn knight_moves_new_board() {
-    let mut game = Game::new();
+    let mut game = Game::default();
 
     let check = |game: &Game, pos: Pos, end_y| {
         let move_pos = Pos::new_xy(pos.x(), end_y);
@@ -55,7 +55,7 @@ fn knight_moves_new_board() {
 
 #[test]
 fn bishop_moves_new_board() {
-    let mut game = Game::new();
+    let mut game = Game::default();
 
     assert!(game.moves_for_pos(Pos::new_xy(2, 0)).unwrap().is_empty());
     assert!(game.moves_for_pos(Pos::new_xy(5, 0)).unwrap().is_empty());
@@ -67,7 +67,7 @@ fn bishop_moves_new_board() {
 
 #[test]
 fn queen_moves_new_board() {
-    let mut game = Game::new();
+    let mut game = Game::default();
 
     assert!(game.moves_for_pos(Pos::new_xy(3, 0)).unwrap().is_empty());
 
@@ -77,7 +77,7 @@ fn queen_moves_new_board() {
 
 #[test]
 fn king_moves_new_board() {
-    let mut game = Game::new();
+    let mut game = Game::default();
 
     assert!(game.moves_for_pos(Pos::new_xy(4, 0)).unwrap().is_empty());
 
@@ -87,7 +87,7 @@ fn king_moves_new_board() {
 
 #[test]
 fn test_with_whole_game() {
-    let mut game = Game::new();
+    let mut game = Game::default();
     let moves = "
             e4 e6 d4 d5 Nd2 Nf6 e5 Nfd7 f4 c5 c3 Nc6 Ndf3 cxd4 cxd4 f6 Bd3 Bb4+ Bd2 
             Qb6 Ne2 fxe5 fxe5 O-O a3 Be7 Qc2 Rxf3 gxf3 Nxd4 Nxd4 Qxd4 O-O-O Nxe5 Bxh7+ 

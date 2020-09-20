@@ -22,8 +22,8 @@ pub struct Game {
     king_pos: Pos,
 }
 
-impl Game {
-    pub fn new() -> Self {
+impl Default for Game {
+    fn default() -> Self {
         let mut game = Game {
             board: Default::default(),
             move_map: MoveMap::new(),
@@ -36,7 +36,9 @@ impl Game {
 
         game
     }
+}
 
+impl Game {
     pub fn switch_side(&mut self) -> bool {
         self.move_map.clear();
         self.color.flip();

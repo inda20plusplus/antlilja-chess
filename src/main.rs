@@ -3,7 +3,7 @@ extern crate chess;
 use chess::*;
 
 fn main() {
-    let mut game = Game::new();
+    let mut game = Game::default();
 
     let mut buffer = String::new();
 
