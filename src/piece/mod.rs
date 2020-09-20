@@ -88,6 +88,10 @@ impl std::fmt::Debug for TaggedPiece {
             c = c.to_ascii_lowercase();
         }
 
-        return write!(f, "{}", c);
+        if self.is_original() {
+            write!(f, "{}*", c)
+        } else {
+            write!(f, "{}", c)
+        }
     }
 }
