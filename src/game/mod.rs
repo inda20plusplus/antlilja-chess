@@ -71,6 +71,10 @@ impl Game {
         self.board.print_ascii(self.player);
     }
 
+    pub fn play_xy(&mut self, from_x: u8, from_y: u8, r#move: Move) -> Result {
+        self.play(Pos::new_xy(from_x, from_y), r#move)
+    }
+
     pub fn play(&mut self, from: Pos, r#move: Move) -> Result {
         if r#move == Move::None {
             return Result::InvalidMove;
