@@ -1,5 +1,7 @@
 use crate::{Color, Move, PieceType, Pos, TaggedPiece};
 
+pub mod debug;
+
 #[cfg(test)]
 mod tests;
 
