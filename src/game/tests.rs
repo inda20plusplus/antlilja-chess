@@ -1,5 +1,12 @@
 use super::*;
 
+fn compare_moves(lhs: &[Move], rhs: &[Move]) {
+    assert_eq!(lhs.len(), rhs.len());
+    if !lhs.iter().all(|a| rhs.iter().find(|&b| a == b).is_some()) {
+        panic!("\nlhs: {:?} does not equal \nrhs: {:?}\n", lhs, rhs);
+    }
+}
+
 #[test]
 fn pawn_moves_new_board() {
     let mut game = Game::default();
