@@ -7,7 +7,7 @@ mod pgn;
 mod tests;
 
 #[derive(PartialEq, Debug)]
-pub enum Result {
+pub enum GameResult {
     InvalidMove,
     Ok,
     Checkmate,
@@ -71,13 +71,13 @@ impl Game {
         self.board.print_ascii(self.player);
     }
 
-    pub fn play_xy(&mut self, from_x: u8, from_y: u8, r#move: Move) -> Result {
+    pub fn play_xy(&mut self, from_x: u8, from_y: u8, r#move: Move) -> GameResult {
         self.play(Pos::new_xy(from_x, from_y), r#move)
     }
 
-    pub fn play(&mut self, from: Pos, r#move: Move) -> Result {
+    pub fn play(&mut self, from: Pos, r#move: Move) -> GameResult {
         if r#move == Move::None {
-            return Result::InvalidMove;
+            return GameResult::InvalidMove;
         }
 
         assert!(from.index() < 64);
@@ -86,13 +86,13 @@ impl Game {
         let moves = self.move_map.at(from);
 
         if moves.is_none() {
-            return Result::InvalidMove;
+            return GameResult::InvalidMove;
         }
 
         let moves = moves.unwrap();
 
         if !moves.contains(&r#move) {
-            return Result::InvalidMove;
+            return GameResult::InvalidMove;
         }
 
         self.history.push((self.board, from, r#move));
@@ -100,12 +100,12 @@ impl Game {
 
         if self.switch_side() {
             if self.board.pos_in_danger(self.king_pos, self.player) {
-                Result::Checkmate
+                GameResult::Checkmate
             } else {
-                Result::Stalemate
+                GameResult::Stalemate
             }
         } else {
-            Result::Ok
+            GameResult::Ok
         }
     }
 

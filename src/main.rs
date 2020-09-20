@@ -1,6 +1,6 @@
 extern crate chess;
 
-use chess::game::{Game, Result};
+use chess::game::{Game, GameResult};
 
 fn main() {
     let mut game = Game::default();
@@ -23,15 +23,15 @@ fn main() {
 
         let result = game.play(from, r#move);
         match result {
-            Result::InvalidMove => {
+            GameResult::InvalidMove => {
                 println!("Invalid move: {}", buffer);
                 continue;
             }
-            Result::Checkmate => {
+            GameResult::Checkmate => {
                 println!("{:?} lost :(", game.current_color());
                 break;
             }
-            Result::Stalemate => {
+            GameResult::Stalemate => {
                 println!("Stalemate!");
                 break;
             }

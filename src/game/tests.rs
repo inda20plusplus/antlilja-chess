@@ -238,7 +238,7 @@ fn test_with_whole_game() {
         assert_ne!(actual_move, Move::None);
 
         let result = game.play(from, actual_move);
-        if result == Result::Checkmate {
+        if result == GameResult::Checkmate {
             println!("{}", str_move);
             assert_eq!(game.current_color(), Color::Black);
             assert_eq!(i, 68);
