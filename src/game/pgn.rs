@@ -1,4 +1,4 @@
-use crate::{Color, Game, Move, PieceType, Pos};
+use crate::{game::Game, Color, Move, PieceType, Pos};
 
 #[derive(Debug)]
 enum Token {

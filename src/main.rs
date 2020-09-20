@@ -1,6 +1,6 @@
 extern crate chess;
 
-use chess::*;
+use chess::game::{Game, Result};
 
 fn main() {
     let mut game = Game::default();

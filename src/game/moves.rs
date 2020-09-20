@@ -1,5 +1,5 @@
 mod inner {
-    use crate::{Color, Game, Move, PieceType, Pos, TaggedPiece};
+    use crate::{Color, game::Game, Move, PieceType, Pos, TaggedPiece};
     impl Game {
         pub fn add_pawn_moves(&mut self, from: Pos) {
             let y_dir: i8 = if self.player == Color::White { 1 } else { -1 };
