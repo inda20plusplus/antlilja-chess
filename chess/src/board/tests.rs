@@ -1,8 +1,10 @@
 use super::*;
 
+use std::str::FromStr;
+
 #[test]
 fn new_board() {
-    let board = Board::new();
+    let board = Board::default();
 
     let exists_at_both_sides = |offset, r#type| {
         assert_eq!(
@@ -40,4 +42,22 @@ fn new_board() {
     exists_matching_at_both_sides(2, PieceType::Bishop);
     exists_at_both_sides(3, PieceType::Queen);
     exists_at_both_sides(4, PieceType::King);
+}
+
+#[test]
+fn from_str() {
+    const DEFAULT_BOARD: &str = "
+        R* N* B* Q* K* B* N* R*
+        P* P* P* P* P* P* P* P*
+        .  .  .  .  .  .  .  .
+        .  .  .  .  .  .  .  .
+        .  .  .  .  .  .  .  .
+        .  .  .  .  .  .  .  .
+        p* p* p* p* p* p* p* p*
+        r* n* b* q* k* b* n* r*";
+
+    let default = Board::default();
+    let from_str = Board::from_str(DEFAULT_BOARD);
+
+    assert_eq!(default, from_str.unwrap());
 }

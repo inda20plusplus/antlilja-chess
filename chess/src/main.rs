@@ -1,9 +1,9 @@
 extern crate chess;
 
-use chess::*;
+use chess::game::{Game, GameResult};
 
 fn main() {
-    let mut game = Game::new();
+    let mut game = Game::default();
 
     let mut buffer = String::new();
 
@@ -16,22 +16,22 @@ fn main() {
         stdin.read_line(&mut buffer).unwrap();
 
         let r#move = game.parse_pgn_move(&buffer);
-        let ((x, y), r#move) = r#move;
+        let (from, r#move) = r#move;
 
         // Clear the screen
         print!("\x1B[2J\x1B[1;1H");
 
-        let result = game.play(x, y, r#move);
+        let result = game.play(from, r#move);
         match result {
-            Result::InvalidMove => {
+            GameResult::InvalidMove => {
                 println!("Invalid move: {}", buffer);
                 continue;
             }
-            Result::Checkmate => {
+            GameResult::Checkmate => {
                 println!("{:?} lost :(", game.current_color());
                 break;
             }
-            Result::Stalemate => {
+            GameResult::Stalemate => {
                 println!("Stalemate!");
                 break;
             }
