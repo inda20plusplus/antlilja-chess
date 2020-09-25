@@ -121,10 +121,17 @@ impl View {
         let cell_size = (board_size - 4.0) / 8.0;
         for x in 0..8 {
             for y in 0..8 {
-                let current_color = if x % 2 != y % 2 {
+
+                let mut current_color = if x % 2 != y % 2 {
                     self.settings.black_color
                 } else {
                     self.settings.white_color
+                };
+
+                if let Some(selected) = controller.selected_square {
+                    if selected[0] == x && selected[1] == y {
+                        current_color = self.settings.move_color
+                    }
                 };
 
                 let x_pos = padding + 2.0 + cell_size * x as f64;
