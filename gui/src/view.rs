@@ -10,6 +10,8 @@ const COLOR_4: [f32; 4] = [0.58, 0.59, 0.63, 1.0];
 const COLOR_5: [f32; 4] = [0.15, 0.12, 0.10, 1.0];
 
 pub struct ViewSettings {
+    pub board_size: f64,
+    pub padding: f64,
     pub background_color: [f32; 4],
     pub border_color: [f32; 4],
     pub white_color: [f32; 4],
@@ -20,6 +22,8 @@ pub struct ViewSettings {
 impl Default for ViewSettings {
     fn default() -> ViewSettings {
         ViewSettings {
+            board_size: 640.0,
+            padding: 192.0,
             background_color: COLOR_3,
             border_color: COLOR_5,
             white_color: COLOR_1,
@@ -75,7 +79,11 @@ impl View {
         textures
     }
 
-    pub fn calculate_size(&self, width: f64, height: f64) -> (f64, f64, f64) {
+    pub fn calculate_size(&self, c: &Context) -> (f64, f64, f64) {
+        let view_size = c.get_view_size();
+        let width: f64 = view_size[0];
+        let height: f64 = view_size[1];
+
         let min_padding = width / 5.0;
 
         if width - min_padding * 2.0 <= height {
@@ -96,24 +104,20 @@ impl View {
     }
 
     pub fn render(&mut self, controller: &GameController, c: Context, g: &mut G2d) {
-        let view_size = c.get_view_size();
-        let width: f64 = view_size[0];
-        let height: f64 = view_size[1];
-
-
-        let (board_size, x_padding, y_padding) = self.calculate_size(width, height);
+        let board_size = self.settings.board_size;
+        let padding = self.settings.padding;
 
         // Draw background
         clear(self.settings.background_color, g);
 
-        // Draw board
         rectangle(
             self.settings.border_color,
-            [x_padding, y_padding, board_size, board_size],
+            [padding, 0.0, board_size, board_size],
             c.transform,
             g,
         );
 
+        // Draw board
         let cell_size = (board_size - 4.0) / 8.0;
         for x in 0..8 {
             for y in 0..8 {
@@ -123,12 +127,13 @@ impl View {
                     self.settings.white_color
                 };
 
-                let x_pos = x_padding + 2.0 + cell_size * x as f64;
-                let y_pos = y_padding + 2.0 + cell_size * (7.0 - y as f64);
+                let x_pos = padding + 2.0 + cell_size * x as f64;
+                let y_pos = 2.0 + cell_size * (7.0 - y as f64);
+                let cell = [x_pos, y_pos, cell_size, cell_size];
 
                 rectangle(
                     current_color,
-                    [x_pos, y_pos, cell_size, cell_size],
+                    cell,
                     c.transform,
                     g,
                 );
