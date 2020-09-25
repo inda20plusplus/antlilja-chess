@@ -4,7 +4,7 @@ extern crate gui;
 use chess::game::{Game, GameResult};
 use gui::game_controller::GameController;
 use gui::view::{View, ViewSettings};
-use piston_window::{PistonWindow, WindowSettings};
+use piston_window::*;
 
 
 fn main() {
@@ -19,6 +19,7 @@ fn main() {
     let textures = View::create_textures(&mut window);
     let mut view = View::new(ViewSettings::default(), textures);
 
+    window.set_lazy(true);
     while let Some(event) = window.next() {
         controller.event(&event);
 
