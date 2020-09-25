@@ -19,7 +19,9 @@ impl GameController {
         }
     }
 
-    pub fn event<E: GenericEvent>(&mut self, e: &E) {
-
+    pub fn event<E: GenericEvent>(&mut self, pos: [f64; 2], size: f64, e: &E) {
+        if let Some(pos) = e.mouse_cursor_args() {
+          self.cursor_pos = pos;
+      }
     }
 }
