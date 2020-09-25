@@ -113,14 +113,14 @@ impl View {
         let cell_size = (board_size - 4.0) / 8.0;
         for x in 0..8 {
             for y in 0..8 {
-                let current_color = if x % 2 == y % 2 {
+                let current_color = if x % 2 != y % 2 {
                     self.settings.black_color
                 } else {
                     self.settings.white_color
                 };
 
                 let x_pos = x_padding + 2.0 + cell_size * x as f64;
-                let y_pos = y_padding + 2.0 + cell_size * y as f64;
+                let y_pos = y_padding + 2.0 + cell_size * (7.0 - y as f64);
 
                 rectangle(
                     current_color,
