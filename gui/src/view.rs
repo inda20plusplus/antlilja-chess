@@ -31,12 +31,14 @@ impl Default for ViewSettings {
 
 pub struct View {
     pub settings: ViewSettings,
+    textures: Vec<G2dTexture>,
 }
 
 impl View {
-    pub fn new(settings: ViewSettings) -> View {
+    pub fn new(settings: ViewSettings, textures: Vec<G2dTexture>) -> View {
         View {
             settings,
+            textures,
         }
     }
 
