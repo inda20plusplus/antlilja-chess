@@ -6,6 +6,7 @@ pub struct GameController {
     pub game: Game,
     pub selected_square: Option<Pos>,
     pub current_moves: Option<Vec<Move>>,
+    cursor_pos: [f64; 2],
 }
 
 impl GameController {
@@ -14,6 +15,7 @@ impl GameController {
             game,
             selected_square: None,
             current_moves: None,
+            cursor_pos: [0.0; 2],
         }
     }
 
