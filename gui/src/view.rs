@@ -138,7 +138,7 @@ impl View {
                     g,
                 );
 
-                let piece = controller.game.at_pos(Pos::new_xy(x, y));
+                let piece = controller.game.at_pos(Pos::new_xy(x as u8, y as u8));
 
                 if !piece.is_empty() {
                     let index = if piece.color() == Color::White {
