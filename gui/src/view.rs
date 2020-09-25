@@ -1,6 +1,6 @@
 use chess::{Color, Pos};
 use crate::game_controller::GameController;
-use piston_window::{self, clear, Context, G2d, G2dTexture, rectangle, Image};
+use piston_window::{self, clear, Context, G2d, G2dTexture, rectangle, ellipse, Image};
 use std::path::Path;
 
 const COLOR_1: [f32; 4] = [0.29, 0.39, 0.54, 1.0];
@@ -145,6 +145,17 @@ impl View {
                     g,
                 );
 
+                if let Some(moves) = &controller.current_moves {
+                    if moves.contains_key(&[x, y]) {
+                        ellipse(
+                            self.settings.move_color,
+                            cell,
+                            c.transform,
+                            g
+                        )
+                    }
+                };
+
                 let piece = controller.game.at_pos(Pos::new_xy(x as u8, y as u8));
 
                 if !piece.is_empty() {
@@ -164,6 +175,5 @@ impl View {
                 }
             }
         }
-
     }
 }
