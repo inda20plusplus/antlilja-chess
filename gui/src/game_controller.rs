@@ -52,7 +52,9 @@ impl GameController {
                 {
                     Some(move_slice) => {
                         let mut moves = HashMap::new();
+                        println!("debug:");
                         for r#move in move_slice.iter() {
+                            println!("{:?}", r#move);
                             match r#move {
                                 Move::Move(pos) => {
                                     moves.insert([pos.x() as usize, pos.y() as usize], *r#move);
