@@ -1,6 +1,7 @@
 use chess::Pos;
 use crate::game_controller::GameController;
-use piston_window::{clear, Context, G2d, rectangle, image, Texture, TextureSettings};
+use piston_window::{self, clear, Context, G2d, G2dTexture, rectangle, Image};
+use std::path::Path;
 
 const COLOR_1: [f32; 4] = [0.29, 0.39, 0.54, 1.0];
 const COLOR_2: [f32; 4] = [0.82, 0.87, 0.96, 1.0];
@@ -37,6 +38,39 @@ impl View {
         View {
             settings,
         }
+    }
+
+    pub fn create_textures(window: &mut piston_window::PistonWindow) -> Vec<G2dTexture> {
+        use piston_window::{Texture, TextureSettings};
+
+        let colors = ["white".to_string(), "black".to_string()];
+        let piece_types = [
+            "pawn".to_string(),
+            "rook".to_string(),
+            "knight".to_string(),
+            "bishop".to_string(),
+            "queen".to_string(),
+            "king".to_string(),
+        ];
+
+        let mut textures: Vec<G2dTexture> = vec![];
+
+
+        for color in colors.iter() {
+            for piece in piece_types.iter() {
+                println!("Fetching texture: {:?}", Path::new(&format!("gui/src/resources/pieces/{}-{}.png", color, piece)));
+                let texture: piston_window::G2dTexture = Texture::from_path(
+                    &mut window.create_texture_context(),
+                    &Path::new(&format!("gui/src/resources/pieces/{}-{}.png", color, piece)),
+                    piston_window::Flip::None,
+                    &TextureSettings::new(),
+                ).unwrap();
+
+                textures.push(texture);
+            }
+        }
+        
+        textures
     }
 
     pub fn render(&mut self, controller: &GameController, c: Context, g: &mut G2d) {
