@@ -34,6 +34,16 @@ impl GameController {
                 let cell_x = (x / size * 8.0) as usize;
                 let cell_y = 7 - (y / size * 8.0) as usize;
 
+                if let Some(moves) = &self.current_moves {
+                    if let Some(r#move) = moves.get(&[cell_x, cell_y]) {
+                        let from = self.selected_square.unwrap();
+                        self.game.play_xy(from[0] as u8, from[1] as u8, *r#move);
+
+                        self.selected_square = None;
+                        self.current_moves = None;
+                        return
+                    }
+                }
                 self.selected_square = Some([cell_x, cell_y]);
 
                 self.current_moves = match self.game.moves_for_pos(Pos::new_xy(cell_x as u8, cell_y as u8)) {
