@@ -75,14 +75,10 @@ impl View {
         textures
     }
 
-    pub fn render(&mut self, controller: &GameController, c: Context, g: &mut G2d) {
-        let view_size = c.get_view_size();
-        let width = view_size[0];
-        let height = view_size[1];
-
+    pub fn calculate_size(&self, width: f64, height: f64) -> (f64, f64, f64) {
         let min_padding = width / 5.0;
 
-        let (board_size, x_padding, y_padding) = if width - min_padding * 2.0 <= height {
+        if width - min_padding * 2.0 <= height {
             let board_size: f64 = width - 2.0 * min_padding;
 
             let x_padding: f64 = min_padding;
@@ -96,8 +92,16 @@ impl View {
             let y_padding: f64 = 0.0;
 
             (board_size, x_padding, y_padding)
-        };
+        }
+    }
 
+    pub fn render(&mut self, controller: &GameController, c: Context, g: &mut G2d) {
+        let view_size = c.get_view_size();
+        let width: f64 = view_size[0];
+        let height: f64 = view_size[1];
+
+
+        let (board_size, x_padding, y_padding) = self.calculate_size(width, height);
 
         // Draw background
         clear(self.settings.background_color, g);
