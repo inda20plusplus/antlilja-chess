@@ -1,7 +1,7 @@
 extern crate chess;
 extern crate gui;
 
-use chess::game::{Game, GameResult};
+use chess::game::Game;
 use gui::game_controller::GameController;
 use gui::view::{View, ViewSettings};
 use piston_window::*;
