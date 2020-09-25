@@ -1,4 +1,4 @@
-use chess::Pos;
+use chess::{Color, Pos};
 use crate::game_controller::GameController;
 use piston_window::{self, clear, Context, G2d, G2dTexture, rectangle, Image};
 use std::path::Path;
@@ -132,6 +132,19 @@ impl View {
                 let piece = controller.game.at_pos(Pos::new_xy(x, y));
 
                 if !piece.is_empty() {
+                    let index = if piece.color() == Color::White {
+                        piece.get_type() as u8 - 1
+                    } else {
+                        piece.get_type() as u8 + 5
+                    };
+                    let image = Image::new().rect([x_pos, y_pos, cell_size, cell_size]);
+
+                    image.draw(
+                        &mut self.textures[index as usize],
+                        &piston_window::DrawState::default(),
+                        c.transform,
+                        g,
+                    )
                 }
             }
         }
