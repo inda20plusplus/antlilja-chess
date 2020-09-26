@@ -64,10 +64,10 @@ impl View {
 
         for color in colors.iter() {
             for piece in piece_types.iter() {
-                println!("Fetching texture: {:?}", Path::new(&format!("gui/src/resources/pieces/{}-{}.png", color, piece)));
+                println!("Fetching texture: {:?}", Path::new(&format!("gui/resources/pieces/{}-{}.png", color, piece)));
                 let texture: piston_window::G2dTexture = Texture::from_path(
                     &mut window.create_texture_context(),
-                    &Path::new(&format!("gui/src/resources/pieces/{}-{}.png", color, piece)),
+                    &Path::new(&format!("gui/resources/pieces/{}-{}.png", color, piece)),
                     piston_window::Flip::None,
                     &TextureSettings::new(),
                 ).unwrap();
