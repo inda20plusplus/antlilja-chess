@@ -169,7 +169,7 @@ impl Game {
                 }
                 [Token::File(x), Token::Rank(y), Token::Promotion, Token::Piece(piece)] => {
                     let dir: i8 = if self.player == Color::White { -1 } else { 1 };
-                    let from = Pos::new_xy(x, y).move_y_non_fail(dir);
+                    let from = Pos::new_xy(x, y).move_y(dir).unwrap();
                     return (from, Move::PawnPromotion(piece, Pos::new_xy(x, y)));
                 }
                 [Token::File(from_x), Token::Rank(from_y), Token::File(x), Token::Rank(y)] => {

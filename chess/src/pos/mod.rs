@@ -35,31 +35,26 @@ impl Pos {
         self.0 >> 3
     }
 
-    pub fn add_x(&self, x: u8) -> Self {
-        assert!(self.is_add_x_allowed(x));
-        Self { 0: self.0 + x }
-    }
-
-    pub fn is_add_x_allowed(&self, x: u8) -> bool {
+    pub fn add_x(&self, x: u8) -> Option<Self> {
         let new_x = self.x() + x;
-        (0..8).contains(&new_x)
+        if (0..8).contains(&new_x) {
+            Some(Self { 0: self.0 + x })
+        } else {
+            None
+        }
     }
 
-    pub fn sub_x(&self, x: u8) -> Self {
-        assert!(self.is_sub_x_allowed(x));
-        Self { 0: self.0 - x }
+    pub fn sub_x(&self, x: u8) -> Option<Self> {
+        let new_x = self.x() as i8 - x as i8;
+        if (0..8).contains(&new_x) {
+            Some(Self { 0: self.0 - x })
+        } else {
+            None
+        }
     }
 
-    pub fn is_sub_x_allowed(&self, x: u8) -> bool {
-        let new_x = self.x() - x;
-        (0..8).contains(&new_x)
-    }
-
-    pub fn move_x_non_fail(&self, x: i8) -> Self {
-        assert!(self.is_move_x_allowed(x));
-
+    pub fn move_x(&self, x: i8) -> Option<Self> {
         let abs_x = x.abs() as u8;
-
         if x > 0 {
             self.add_x(abs_x)
         } else {
@@ -67,50 +62,30 @@ impl Pos {
         }
     }
 
-    pub fn is_move_x_allowed(&self, x: i8) -> bool {
-        let new_x = self.x() as i8 + x;
-        (0..8).contains(&new_x)
-    }
-
-    pub fn move_x(&self, x: i8) -> Option<Self> {
-        if self.is_move_x_allowed(x) {
-            Some(self.move_x_non_fail(x))
+    pub fn add_y(&self, y: u8) -> Option<Self> {
+        let new_y = self.y() + y;
+        if (0..8).contains(&new_y) {
+            Some(Self {
+                0: self.0 + (y << 3),
+            })
         } else {
             None
         }
     }
 
-    pub fn add_y(&self, y: u8) -> Self {
-        assert!(self.is_add_y_allowed(y));
-
-        Self {
-            0: self.0 + (y << 3),
+    pub fn sub_y(&self, y: u8) -> Option<Self> {
+        let new_y = self.y() as i8 - y as i8;
+        if (0..8).contains(&new_y) {
+            Some(Self {
+                0: self.0 - (y << 3),
+            })
+        } else {
+            None
         }
     }
 
-    pub fn is_add_y_allowed(&self, y: u8) -> bool {
-        let new_y = (self.0 >> 3) + y;
-        (0..8).contains(&new_y)
-    }
-
-    pub fn sub_y(&self, y: u8) -> Self {
-        assert!(self.sub_y_inside_board(y));
-
-        Self {
-            0: self.0 - (y << 3),
-        }
-    }
-
-    pub fn sub_y_inside_board(&self, y: u8) -> bool {
-        let new_y = (self.0 >> 3) - y;
-        (0..8).contains(&new_y)
-    }
-
-    pub fn move_y_non_fail(&self, y: i8) -> Self {
-        assert!(self.is_move_y_allowed(y));
-
+    pub fn move_y(&self, y: i8) -> Option<Self> {
         let abs_y = y.abs() as u8;
-
         if y > 0 {
             self.add_y(abs_y)
         } else {
@@ -118,30 +93,9 @@ impl Pos {
         }
     }
 
-    pub fn is_move_y_allowed(&self, y: i8) -> bool {
-        let new_y = self.y() as i8 + y;
-        (0..8).contains(&new_y)
-    }
-
-    pub fn move_y(&self, y: i8) -> Option<Self> {
-        if self.is_move_y_allowed(y) {
-            Some(self.move_y_non_fail(y))
-        } else {
-            None
-        }
-    }
-
-    pub fn is_move_xy_allowed(&self, x: i8, y: i8) -> bool {
-        self.is_move_x_allowed(x) && self.is_move_y_allowed(y)
-    }
-
-    pub fn move_xy_non_fail(&self, x: i8, y: i8) -> Self {
-        self.move_x_non_fail(x).move_y_non_fail(y)
-    }
-
     pub fn move_xy(&self, x: i8, y: i8) -> Option<Self> {
-        if self.is_move_xy_allowed(x, y) {
-            Some(self.move_xy_non_fail(x, y))
+        if let Some(pos) = self.move_x(x) {
+            pos.move_y(y)
         } else {
             None
         }

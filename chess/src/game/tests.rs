@@ -17,8 +17,8 @@ fn pawn_moves_new_board() {
         for x in 0..8 {
             let from = Pos::new_xy(x, y_start);
             let correct_moves = [
-                Move::Move(from.move_y_non_fail(y_dir)),
-                Move::Move(from.move_y_non_fail(y_dir * 2)),
+                Move::Move(from.move_y(y_dir).unwrap()),
+                Move::Move(from.move_y(y_dir * 2).unwrap()),
             ];
 
             assert_eq!(game.moves_for_pos(from).unwrap(), &correct_moves);
@@ -48,7 +48,10 @@ fn knight_moves_new_board() {
 
     let check = |game: &Game, pos: Pos, end_y| {
         let move_pos = Pos::new_xy(pos.x(), end_y);
-        let correct_moves = [Move::Move(move_pos.add_x(1)), Move::Move(move_pos.sub_x(1))];
+        let correct_moves = [
+            Move::Move(move_pos.add_x(1).unwrap()),
+            Move::Move(move_pos.sub_x(1).unwrap()),
+        ];
 
         assert_eq!(game.moves_for_pos(pos).unwrap(), &correct_moves);
     };

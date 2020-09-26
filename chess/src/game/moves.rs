@@ -55,7 +55,7 @@ mod inner {
                     let (_, last_from, last_move) = last;
                     let mut r#move = Move::None;
                     if let Move::Move(last_to) = last_move {
-                        if last_from.distance_y(last_to) == 2 && last_from.move_y_non_fail(y_dir * -1) == to {
+                        if last_from.distance_y(last_to) == 2 && last_from.move_y(y_dir * -1).unwrap() == to {
                             r#move = Move::EnPassant(to)
                         }
                     }
@@ -70,13 +70,13 @@ mod inner {
                 }
             };
 
-            let y_forward = from.move_y_non_fail(y_dir);
-            if !from.at_right_edge() {
-                add_pawn_take(y_forward.add_x(1));
+            let y_forward = from.move_y(y_dir).unwrap();
+            if let Some(pos) = y_forward.add_x(1) {
+                add_pawn_take(pos);
             }
 
-            if !from.at_left_edge() {
-                add_pawn_take(y_forward.sub_x(1));
+            if let Some(pos) = y_forward.sub_x(1) {
+                add_pawn_take(pos);
             }
         }
 
@@ -104,7 +104,7 @@ mod inner {
 
             // Left
             for dist in 1..(x + 1) {
-                if !loop_internal(from.sub_x(dist)) {
+                if !loop_internal(from.sub_x(dist).unwrap()) {
                     break;
                 }
             }
@@ -118,7 +118,7 @@ mod inner {
 
             // Down
             for dist in 1..(y + 1) {
-                if !loop_internal(from.sub_y(dist)) {
+                if !loop_internal(from.sub_y(dist).unwrap()) {
                     break;
                 }
             }
@@ -130,7 +130,7 @@ mod inner {
             let mut check = |x_dir: i8, y_dir: i8, dist: u8| {
                 let dist = dist as i8;
                 for off in 1..dist {
-                    let to = from.move_xy_non_fail(off * x_dir, off * y_dir);
+                    let to = from.move_xy(off * x_dir, off * y_dir).unwrap();
                     let piece = self.at_pos(to);
 
                     if piece.is_empty() || piece.color() != self.player {
