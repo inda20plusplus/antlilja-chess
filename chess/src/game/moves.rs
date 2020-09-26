@@ -1,20 +1,23 @@
 mod inner {
-    use crate::{Color, game::Game, Move, PieceType, Pos, TaggedPiece};
+    use crate::{game::Game, Color, Move, PieceType, Pos, TaggedPiece};
     impl Game {
         pub fn add_pawn_moves(&mut self, from: Pos) {
             let y_dir: i8 = if self.player == Color::White { 1 } else { -1 };
-            
-            if let Some(to) = from.move_y(y_dir)  {
+
+            if let Some(to) = from.move_y(y_dir) {
                 if self.at_pos(to).is_empty() {
                     // Promotion
                     if to.at_y_edge() {
                         let r#move = Move::PawnPromotion(PieceType::Queen, to);
-                        
+
                         if !self.king_in_danger_after_move(from, r#move) {
                             self.move_map.insert(r#move);
-                            self.move_map.insert(Move::PawnPromotion(PieceType::Knight, to));
-                            self.move_map.insert(Move::PawnPromotion(PieceType::Bishop, to));
-                            self.move_map.insert(Move::PawnPromotion(PieceType::Rook, to));
+                            self.move_map
+                                .insert(Move::PawnPromotion(PieceType::Knight, to));
+                            self.move_map
+                                .insert(Move::PawnPromotion(PieceType::Bishop, to));
+                            self.move_map
+                                .insert(Move::PawnPromotion(PieceType::Rook, to));
                         }
                     }
                     // Standard forward
@@ -46,7 +49,7 @@ mod inner {
                 // Standard diagonal pawn take
                 if !space.is_empty() && space.color() != self.player {
                     Move::Move(to)
-                } 
+                }
                 // En passant
                 else if let Some(last) = self.history.last() {
                     let (_, last_from, last_move) = last;
@@ -86,23 +89,23 @@ mod inner {
                         self.move_map.insert(r#move);
                     }
                 }
-                
+
                 return space.is_empty();
             };
 
             let (x, y) = from.xy();
-            
+
             // Right
             for x in (x + 1)..8 {
                 if !loop_internal(Pos::new_xy(x, y)) {
                     break;
                 }
             }
-            
+
             // Left
-            for dist in 1..(x+1) {
+            for dist in 1..(x + 1) {
                 if !loop_internal(from.sub_x(dist)) {
-                     break;
+                    break;
                 }
             }
 
@@ -114,7 +117,7 @@ mod inner {
             }
 
             // Down
-            for dist in 1..(y+1) {
+            for dist in 1..(y + 1) {
                 if !loop_internal(from.sub_y(dist)) {
                     break;
                 }
@@ -166,7 +169,6 @@ mod inner {
                             self.move_map.insert(r#move);
                         }
                     }
-
                 };
 
                 if let Some(to) = from.move_xy(x_dir, y_dir * 2) {
@@ -188,11 +190,12 @@ mod inner {
             let mut check = |x_dir: i8, y_dir: i8| {
                 if let Some(to) = from.move_xy(x_dir, y_dir) {
                     let piece = self.at_pos(to);
-                    
+
                     if piece.is_empty() || piece.color() != self.player {
-                        let r#move = Move::Move(to);   
-                        let board_after_move = self.board.board_after_move(from, r#move, self.player);
-                        
+                        let r#move = Move::Move(to);
+                        let board_after_move =
+                            self.board.board_after_move(from, r#move, self.player);
+
                         if !board_after_move.pos_in_danger(to, self.player) {
                             self.move_map.insert(r#move);
                         }

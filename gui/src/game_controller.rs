@@ -1,8 +1,8 @@
-use chess::Pos;
-use chess::Move;
 use chess::game::{Game, GameResult};
+use chess::Move;
+use chess::Pos;
+use piston_window::{Button, GenericEvent, MouseButton};
 use std::collections::HashMap;
-use piston_window::{GenericEvent, Button, MouseButton};
 
 pub struct GameController {
     pub game: Game,
@@ -23,7 +23,7 @@ impl GameController {
 
     pub fn event<E: GenericEvent>(&mut self, pos: [f64; 2], size: f64, e: &E) {
         if let Some(pos) = e.mouse_cursor_args() {
-          self.cursor_pos = pos;
+            self.cursor_pos = pos;
         }
 
         if let Some(Button::Mouse(MouseButton::Left)) = e.press_args() {
@@ -41,54 +41,41 @@ impl GameController {
 
                         self.selected_square = None;
                         self.current_moves = None;
-                        return
+                        return;
                     }
                 }
                 self.selected_square = Some([cell_x, cell_y]);
 
-                self.current_moves = match self.game.moves_for_pos(Pos::new_xy(cell_x as u8, cell_y as u8)) {
+                self.current_moves = match self
+                    .game
+                    .moves_for_pos(Pos::new_xy(cell_x as u8, cell_y as u8))
+                {
                     Some(move_slice) => {
                         let mut moves = HashMap::new();
                         for r#move in move_slice.iter() {
                             match r#move {
                                 Move::Move(pos) => {
-                                    moves.insert(
-                                        [pos.x() as usize, pos.y() as usize],
-                                        *r#move
-                                    );
+                                    moves.insert([pos.x() as usize, pos.y() as usize], *r#move);
                                 }
                                 Move::EnPassant(pos) => {
-                                    moves.insert(
-                                        [pos.x() as usize, pos.y() as usize],
-                                        *r#move
-                                    );
+                                    moves.insert([pos.x() as usize, pos.y() as usize], *r#move);
                                 }
                                 Move::PawnPromotion(_, pos) => {
-                                    moves.insert(
-                                        [pos.x() as usize, pos.y() as usize],
-                                        *r#move
-                                    );
+                                    moves.insert([pos.x() as usize, pos.y() as usize], *r#move);
                                 }
                                 Move::KingSideCastling => {
-                                    moves.insert(
-                                        [cell_x + 2, cell_y],
-                                        *r#move
-                                    );
+                                    moves.insert([cell_x + 2, cell_y], *r#move);
                                 }
                                 Move::QueenSideCastling => {
-                                    moves.insert(
-                                        [cell_x - 3, cell_y],
-                                        *r#move
-                                    );
+                                    moves.insert([cell_x - 3, cell_y], *r#move);
                                 }
                                 _ => (),
                             }
                         }
                         Some(moves)
                     }
-                    None => None
+                    None => None,
                 };
-
             }
         }
     }
