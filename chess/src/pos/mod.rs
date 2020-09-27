@@ -8,10 +8,12 @@ pub struct Pos(u8);
 
 impl Pos {
     pub fn new_xy(x: u8, y: u8) -> Self {
+        assert!(x < 8 && y < 8);
         Pos { 0: x | (y << 3) }
     }
 
     pub fn new_index(i: u8) -> Self {
+        assert!(i < 64);
         Self { 0: i }
     }
 
