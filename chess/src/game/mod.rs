@@ -54,7 +54,7 @@ impl Game {
     }
     pub fn switch_side(&mut self) -> bool {
         self.move_map.clear();
-        self.player.flip();
+        self.player = self.player.flip();
         self.king_pos = self.board.find_king(self.player);
         self.calculate_all_moves()
     }

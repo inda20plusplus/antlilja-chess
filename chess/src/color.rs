@@ -6,10 +6,8 @@ pub enum Color {
 }
 
 impl Color {
-    pub fn flip(&mut self) {
-        unsafe {
-            *self = std::mem::transmute((*self as u8) ^ 128);
-        }
+    pub fn flip(&self) -> Self {
+        unsafe { std::mem::transmute::<u8, Color>((*self as u8) ^ 128) }
     }
 }
 
@@ -19,10 +17,8 @@ mod tests {
 
     #[test]
     fn flip() {
-        let mut color = Color::White;
-        color.flip();
-        assert_eq!(color, Color::Black);
-        color.flip();
-        assert_eq!(color, Color::White);
+        let color = Color::White;
+        assert_eq!(color.flip(), Color::Black);
+        assert_eq!(color.flip().flip(), Color::White);
     }
 }
