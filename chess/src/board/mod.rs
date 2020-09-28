@@ -220,6 +220,31 @@ impl Board {
             }
         }
 
+        let dirs: [(i8, i8); 4] = [(1, 1), (1, -1), (-1, -1), (-1, 1)];
+
+        for (x, y) in dirs.iter() {
+            let dir_move = |off_x, off_y| {
+                if let Some(new_pos) = pos.move_xy(off_x, off_y) {
+                    let piece = self.at_pos(new_pos);
+                    if !piece.is_empty()
+                        && piece.color() != color
+                        && piece.get_type() == PieceType::Knight
+                    {
+                        return true;
+                    }
+                }
+                false
+            };
+
+            if dir_move(x * 2, *y) {
+                return true;
+            }
+
+            if dir_move(*x, y * 2) {
+                return true;
+            }
+        }
+
         false
     }
 
