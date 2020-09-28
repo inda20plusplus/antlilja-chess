@@ -96,7 +96,7 @@ impl Game {
         }
 
         self.history.push((self.board, from, r#move));
-        self.board = self.board.board_after_move(from, r#move, self.player);
+        self.board = self.board.after_move(from, r#move, self.player);
 
         if self.switch_side() {
             if self.board.pos_in_danger(self.king_pos, self.player) {
@@ -200,7 +200,7 @@ impl Game {
     }
 
     fn king_in_danger_after_move(&self, from: Pos, r#move: Move) -> bool {
-        let board_after_move = self.board.board_after_move(from, r#move, self.player);
+        let board_after_move = self.board.after_move(from, r#move, self.player);
         board_after_move.pos_in_danger(self.king_pos, self.player)
     }
 }

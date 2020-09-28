@@ -199,8 +199,7 @@ mod inner {
 
                     if piece.is_empty() || piece.color() != self.player {
                         let r#move = Move::Move(to);
-                        let board_after_move =
-                            self.board.board_after_move(from, r#move, self.player);
+                        let board_after_move = self.board.after_move(from, r#move, self.player);
 
                         if !board_after_move.pos_in_danger(to, self.player) {
                             self.move_map.insert(r#move);
@@ -258,7 +257,7 @@ mod inner {
                 return;
             }
 
-            let board_with_move = self.board.board_after_move(king_pos, r#move, self.player);
+            let board_with_move = self.board.after_move(king_pos, r#move, self.player);
             let new_king_pos = Pos::new_xy(king_x, y);
             if !board_with_move.pos_in_danger(new_king_pos, self.player) {
                 self.move_map.insert(r#move);

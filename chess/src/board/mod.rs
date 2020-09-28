@@ -96,7 +96,7 @@ impl Board {
         self.find_first_of_type(PieceType::King, color).unwrap()
     }
 
-    pub fn board_after_move(&self, from: Pos, r#move: Move, color: Color) -> Self {
+    pub fn after_move(&self, from: Pos, r#move: Move, color: Color) -> Self {
         let mut board = *self;
         match r#move {
             Move::Move(to) => {
