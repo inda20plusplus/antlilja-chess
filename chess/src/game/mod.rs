@@ -41,10 +41,10 @@ impl Default for Game {
 impl Game {
     pub fn from_board(board: Board, player: Color) -> Self {
         let mut game = Self {
-            board: board,
+            board,
             move_map: MoveMap::new(),
             history: Vec::with_capacity(50),
-            player: player,
+            player,
             king_pos: board.find_king(player),
         };
 
