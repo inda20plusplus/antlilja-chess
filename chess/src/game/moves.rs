@@ -4,21 +4,25 @@ mod inner {
         pub fn add_pawn_moves(&mut self, from: Pos) {
             let y_dir: i8 = if self.player == Color::White { 1 } else { -1 };
 
+            let add_promotion_moves = |game: &mut Game, to: Pos| {
+                let r#move = Move::PawnPromotion(PieceType::Queen, to);
+
+                if !game.king_in_danger_after_move(from, r#move) {
+                    game.move_map.insert(r#move);
+                    game.move_map
+                        .insert(Move::PawnPromotion(PieceType::Knight, to));
+                    game.move_map
+                        .insert(Move::PawnPromotion(PieceType::Bishop, to));
+                    game.move_map
+                        .insert(Move::PawnPromotion(PieceType::Rook, to));
+                }
+            };
+
             if let Some(to) = from.move_y(y_dir) {
                 if self.at_pos(to).is_empty() {
                     // Promotion
                     if to.at_y_edge() {
-                        let r#move = Move::PawnPromotion(PieceType::Queen, to);
-
-                        if !self.king_in_danger_after_move(from, r#move) {
-                            self.move_map.insert(r#move);
-                            self.move_map
-                                .insert(Move::PawnPromotion(PieceType::Knight, to));
-                            self.move_map
-                                .insert(Move::PawnPromotion(PieceType::Bishop, to));
-                            self.move_map
-                                .insert(Move::PawnPromotion(PieceType::Rook, to));
-                        }
+                        add_promotion_moves(self, to);
                     }
                     // Standard forward
                     else {
@@ -45,28 +49,30 @@ mod inner {
             let mut add_pawn_take = |to| {
                 let space = self.at_pos(to);
 
-                let r#move = 
                 // Standard diagonal pawn take
                 if !space.is_empty() && space.color() != self.player {
-                    Move::Move(to)
+                    if to.at_y_edge() {
+                        add_promotion_moves(self, to);
+                    } else {
+                        let r#move = Move::Move(to);
+                        if !self.king_in_danger_after_move(from, r#move) {
+                            self.move_map.insert(r#move);
+                        }
+                    }
                 }
                 // En passant
                 else if let Some(last) = self.history.last() {
                     let (_, last_from, last_move) = last;
-                    let mut r#move = Move::None;
                     if let Move::Move(last_to) = last_move {
-                        if last_from.distance_y(last_to) == 2 && last_from.move_y(y_dir * -1).unwrap() == to {
-                            r#move = Move::EnPassant(to)
+                        if last_from.distance_y(last_to) == 2
+                            && last_from.move_y(y_dir * -1).unwrap() == to
+                        {
+                            let r#move = Move::EnPassant(to);
+                            if !self.king_in_danger_after_move(from, r#move) {
+                                self.move_map.insert(r#move);
+                            }
                         }
                     }
-                    r#move
-                }
-                else {
-                    Move::None
-                };
-
-                if r#move != Move::None && !self.king_in_danger_after_move(from, r#move) {
-                    self.move_map.insert(r#move);
                 }
             };
 
