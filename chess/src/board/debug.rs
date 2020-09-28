@@ -7,7 +7,7 @@ impl std::fmt::Debug for Board {
             for x in 0..8 {
                 write!(f, "{}", self.0[start + x])?;
             }
-            write!(f, "\n")?;
+            writeln!(f, "")?;
         }
         Ok(())
     }
