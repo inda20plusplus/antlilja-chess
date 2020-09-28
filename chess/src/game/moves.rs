@@ -96,7 +96,7 @@ mod inner {
                     }
                 }
 
-                return space.is_empty();
+                space.is_empty()
             };
 
             let (x, y) = from.xy();
@@ -236,7 +236,7 @@ mod inner {
                     return false;
                 }
 
-                return true;
+                true
             };
 
             let (r#move, king_x) = if self.at_xy(0, y).is_original()
