@@ -129,14 +129,7 @@ impl Pos {
 
     pub fn at_pawn_rank(&self, color: Color) -> bool {
         let y = self.y();
-
-        if color == Color::White && y == 1 {
-            true
-        } else if color == Color::Black && y == 6 {
-            true
-        } else {
-            false
-        }
+        (color == Color::White && y == 1) || (color == Color::Black && y == 6)
     }
 
     pub fn distance_x(&self, other: &Pos) -> u8 {
