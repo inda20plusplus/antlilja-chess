@@ -1,4 +1,4 @@
-use chess::game::{Game, GameResult};
+use chess::game::Game;
 use chess::Move;
 use chess::Pos;
 use piston_window::{Button, GenericEvent, MouseButton};
