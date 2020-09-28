@@ -206,6 +206,77 @@ fn move_xy() {
 }
 
 #[test]
+fn at_left_edge() {
+    for x in 0..8 {
+        for y in 0..8 {
+            let pos = Pos::new_xy(x, y);
+            assert_eq!(x == 0, pos.at_left_edge());
+        }
+    }
+}
+
+#[test]
+fn at_right_edge() {
+    for x in 0..8 {
+        for y in 0..8 {
+            let pos = Pos::new_xy(x, y);
+            assert_eq!(x == 7, pos.at_right_edge());
+        }
+    }
+}
+
+#[test]
+fn at_x_edge() {
+    for x in 0..8 {
+        for y in 0..8 {
+            let pos = Pos::new_xy(x, y);
+            assert_eq!(x == 0 || x == 7, pos.at_x_edge());
+        }
+    }
+}
+
+#[test]
+fn at_white_edge() {
+    for x in 0..8 {
+        for y in 0..8 {
+            let pos = Pos::new_xy(x, y);
+            assert_eq!(y == 0, pos.at_white_edge());
+        }
+    }
+}
+
+#[test]
+fn at_black_edge() {
+    for x in 0..8 {
+        for y in 0..8 {
+            let pos = Pos::new_xy(x, y);
+            assert_eq!(y == 7, pos.at_black_edge());
+        }
+    }
+}
+
+#[test]
+fn at_y_edge() {
+    for x in 0..8 {
+        for y in 0..8 {
+            let pos = Pos::new_xy(x, y);
+            assert_eq!(y == 0 || y == 7, pos.at_y_edge());
+        }
+    }
+}
+
+#[test]
+fn at_pawn_rank() {
+    for x in 0..8 {
+        for y in 0..8 {
+            let pos = Pos::new_xy(x, y);
+            assert_eq!(y == 1, pos.at_pawn_rank(Color::White));
+            assert_eq!(y == 6, pos.at_pawn_rank(Color::Black));
+        }
+    }
+}
+
+#[test]
 fn distance() {
     for x in 0..8 {
         for y in 0..8 {
