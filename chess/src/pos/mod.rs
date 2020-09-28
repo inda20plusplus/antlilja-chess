@@ -104,11 +104,11 @@ impl Pos {
     }
 
     pub fn at_left_edge(&self) -> bool {
-        (self.0 & 0b111) == 0
+        self.0.trailing_zeros() >= 3
     }
 
     pub fn at_right_edge(&self) -> bool {
-        (self.0 & 0b111) == 0b111
+        self.0.trailing_ones() >= 3
     }
 
     pub fn at_x_edge(&self) -> bool {
