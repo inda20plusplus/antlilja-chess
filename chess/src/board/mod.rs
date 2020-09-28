@@ -135,7 +135,7 @@ impl Board {
             _ => panic!("Unimplemented move {:?}", r#move),
         }
 
-        return board;
+        board
     }
 
     pub fn pos_in_danger(&self, pos: Pos, color: Color) -> bool {
