@@ -156,7 +156,7 @@ impl View {
                     let image = Image::new().rect([x_pos, y_pos, cell_size, cell_size]);
 
                     image.draw(
-                        &mut self.textures[index as usize],
+                        &self.textures[index as usize],
                         &piston_window::DrawState::default(),
                         c.transform,
                         g,
