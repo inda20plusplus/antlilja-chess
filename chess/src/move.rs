@@ -13,6 +13,6 @@ pub enum Move {
 
 impl Move {
     pub fn move_xy(x: u8, y: u8) -> Self {
-        return Move::Move(Pos::new_xy(x, y));
+        Move::Move(Pos::new_xy(x, y))
     }
 }
