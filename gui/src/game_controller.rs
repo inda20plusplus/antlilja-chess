@@ -4,8 +4,21 @@ use chess::Pos;
 use piston_window::{Button, GenericEvent, MouseButton};
 use std::collections::HashMap;
 
+pub enum Ending {
+    White,
+    Black,
+    Tie,
+}
+
+pub enum State {
+    Playing,
+    Promotion(Pos),
+    End(Ending),
+}
+
 pub struct GameController {
     pub game: Game,
+    pub state: State,
     pub selected_square: Option<[usize; 2]>,
     pub current_moves: Option<HashMap<[usize; 2], Move>>,
     cursor_pos: [f64; 2],
@@ -15,6 +28,7 @@ impl GameController {
     pub fn new(game: Game) -> GameController {
         GameController {
             game,
+            state: State::Playing,
             selected_square: None,
             current_moves: None,
             cursor_pos: [0.0; 2],
