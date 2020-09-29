@@ -35,18 +35,18 @@ impl GameController {
         }
     }
 
-    pub fn event<E: GenericEvent>(&mut self, pos: [f64; 2], size: f64, e: &E) {
+    pub fn event<E: GenericEvent>(&mut self, board_pos: [f64; 2], board_size: f64, e: &E) {
         if let Some(mouse_pos) = e.mouse_cursor_args() {
             self.cursor_pos = mouse_pos;
         }
 
         if let Some(Button::Mouse(MouseButton::Left)) = e.press_args() {
-            let x = self.cursor_pos[0] - pos[0] - 2.0;
-            let y = self.cursor_pos[1] - pos[1] - 2.0;
+            let x = self.cursor_pos[0] - board_pos[0] - 2.0;
+            let y = self.cursor_pos[1] - board_pos[1] - 2.0;
 
-            if x >= 0.0 && x < size && y >= 0.0 && y < size {
-                let cell_x = (x / size * 8.0) as usize;
-                let cell_y = 7 - (y / size * 8.0) as usize;
+            if x >= 0.0 && x < board_size && y >= 0.0 && y < board_size {
+                let cell_x = (x / board_size * 8.0) as usize;
+                let cell_y = 7 - (y / board_size * 8.0) as usize;
 
                 if let Some(moves) = &self.current_moves {
                     if let Some(r#move) = moves.get(&[cell_x, cell_y]) {
