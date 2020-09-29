@@ -63,6 +63,10 @@ impl Game {
         self.player
     }
 
+    pub fn is_king_in_danger(&self) -> bool {
+        self.board.pos_in_danger(self.king_pos, self.player)
+    }
+
     pub fn moves_for_pos(&self, pos: Pos) -> Option<&[Move]> {
         self.move_map.at(pos)
     }
