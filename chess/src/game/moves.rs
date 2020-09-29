@@ -222,6 +222,10 @@ mod inner {
             let y = if self.player == Color::White { 0 } else { 7 };
             let king_pos = Pos::new_xy(4, y);
 
+            if self.king_pos != king_pos || self.is_king_in_danger() {
+                return;
+            }
+
             let mut board_without_king = self.board;
             board_without_king.set_pos(king_pos, TaggedPiece::empty());
 
