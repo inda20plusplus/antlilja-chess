@@ -36,8 +36,8 @@ impl GameController {
     }
 
     pub fn event<E: GenericEvent>(&mut self, pos: [f64; 2], size: f64, e: &E) {
-        if let Some(pos) = e.mouse_cursor_args() {
-            self.cursor_pos = pos;
+        if let Some(mouse_pos) = e.mouse_cursor_args() {
+            self.cursor_pos = mouse_pos;
         }
 
         if let Some(Button::Mouse(MouseButton::Left)) = e.press_args() {
