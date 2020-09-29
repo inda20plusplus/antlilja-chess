@@ -17,7 +17,7 @@ pub enum GameResult {
 pub struct Game {
     board: Board,
     move_map: MoveMap,
-    history: Vec<(Board, Pos, Move)>,
+    last_move: (Pos, Move),
     player: Color,
     king_pos: Pos,
 }
@@ -27,7 +27,7 @@ impl Default for Game {
         let mut game = Game {
             board: Default::default(),
             move_map: MoveMap::new(),
-            history: Vec::<(Board, Pos, Move)>::with_capacity(50),
+            last_move: (Pos::invalid(), Move::None),
             player: Color::White,
             king_pos: Pos::new_xy(4, 0),
         };
@@ -43,7 +43,7 @@ impl Game {
         let mut game = Self {
             board,
             move_map: MoveMap::new(),
-            history: Vec::with_capacity(50),
+            last_move: (Pos::invalid(), Move::None),
             player,
             king_pos: board.find_king(player),
         };
@@ -95,7 +95,7 @@ impl Game {
             return GameResult::InvalidMove;
         }
 
-        self.history.push((self.board, from, r#move));
+        self.last_move = (from, r#move);
         self.board = self.board.after_move(from, r#move, self.player);
 
         if self.switch_side() {
@@ -107,23 +107,6 @@ impl Game {
         } else {
             GameResult::Ok
         }
-    }
-
-    pub fn undo(&mut self, steps: usize) -> bool {
-        if steps >= self.history.len() {
-            return false;
-        }
-
-        self.board = self.history[self.history.len() - 1 - steps].0;
-        self.history.truncate(self.history.len() - steps);
-
-        if steps % 2 != 0 {
-            self.player.flip();
-        }
-
-        self.king_pos = self.board.find_king(self.player);
-        let _ = self.calculate_all_moves();
-        true
     }
 
     pub fn at_xy(&self, x: u8, y: u8) -> TaggedPiece {
@@ -140,19 +123,6 @@ impl Game {
 
     pub fn board(&self) -> &Board {
         &self.board
-    }
-
-    pub fn history(&self, steps: usize) -> &(Board, Pos, Move) {
-        assert!(steps < self.history.len());
-        &self.history[self.history.len() - 1 - steps]
-    }
-
-    pub fn history_len(&self) -> usize {
-        self.history.len()
-    }
-
-    pub fn history_iter(&self) -> std::slice::Iter<'_, (Board, Pos, Move)> {
-        self.history.iter()
     }
 
     fn calculate_all_moves(&mut self) -> bool {

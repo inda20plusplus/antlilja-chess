@@ -61,8 +61,8 @@ mod inner {
                     }
                 }
                 // En passant
-                else if let Some(last) = self.history.last() {
-                    let (_, last_from, last_move) = last;
+                else if self.last_move.0 != Pos::invalid() {
+                    let (last_from, last_move) = self.last_move;
                     if let Move::Move(last_to) = last_move {
                         if last_from.distance_y(last_to) == 2
                             && last_from.move_y(y_dir * -1).unwrap() == to
