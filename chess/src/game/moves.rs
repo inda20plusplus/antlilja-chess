@@ -64,12 +64,20 @@ mod inner {
                 else if self.last_move.0 != Pos::invalid() {
                     let (last_from, last_move) = self.last_move;
                     if let Move::Move(last_to) = last_move {
-                        if last_from.distance_y(last_to) == 2
-                            && last_from.move_y(y_dir * -1).unwrap() == to
-                        {
-                            let r#move = Move::EnPassant(to);
-                            if !self.king_in_danger_after_move(from, r#move) {
-                                self.move_map.insert(r#move);
+                        if last_from.distance_y(&last_to) == 2 {
+                            let space = self.at_pos(last_to);
+                            if !space.is_empty()
+                                && space.color() != self.player
+                                && space.get_type() == PieceType::Pawn
+                            {
+                                if let Some(new_pos) = last_from.move_y(y_dir * -1) {
+                                    if new_pos == to {
+                                        let r#move = Move::EnPassant(to);
+                                        if !self.king_in_danger_after_move(from, r#move) {
+                                            self.move_map.insert(r#move);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
