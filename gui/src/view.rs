@@ -79,7 +79,7 @@ impl View {
         textures
     }
 
-    pub fn calculate_size(&self, c: &Context) -> (f64, f64, f64) {
+    pub fn calculate_size(c: &Context) -> (f64, f64, f64) {
         let view_size = c.get_view_size();
         let width: f64 = view_size[0];
         let height: f64 = view_size[1];
