@@ -156,13 +156,13 @@ mod inner {
             check(-1, -1, min(from.x(), from.y()) + 1);
 
             // SE
-            check(1, -1, min(8 - from.x(), from.y()));
+            check(1, -1, min(8 - from.x(), from.y() + 1));
 
             // NE
             check(1, 1, min(8 - from.x(), 8 - from.y()));
 
             // NW
-            check(-1, 1, min(from.x(), 8 - from.y()));
+            check(-1, 1, min(from.x() + 1, 8 - from.y()));
         }
 
         pub fn add_knight_moves(&mut self, from: Pos) {
