@@ -135,7 +135,7 @@ mod inner {
 
             let mut check = |x_dir: i8, y_dir: i8, dist: u8| {
                 let dist = dist as i8;
-                for off in 1..dist {
+                for off in 1..=dist {
                     let to = from.move_xy(off * x_dir, off * y_dir).unwrap();
                     let piece = self.at_pos(to);
 
@@ -153,16 +153,16 @@ mod inner {
             };
 
             // SW
-            check(-1, -1, min(from.x(), from.y()) + 1);
+            check(-1, -1, min(from.x(), from.y()));
 
             // SE
-            check(1, -1, min(8 - from.x(), from.y()));
+            check(1, -1, min(7 - from.x(), from.y()));
 
             // NE
-            check(1, 1, min(8 - from.x(), 8 - from.y()));
+            check(1, 1, min(7 - from.x(), 7 - from.y()));
 
             // NW
-            check(-1, 1, min(from.x(), 8 - from.y()));
+            check(-1, 1, min(from.x(), 7 - from.y()));
         }
 
         pub fn add_knight_moves(&mut self, from: Pos) {
