@@ -205,7 +205,7 @@ impl Board {
 
                 let dist_x = hit.distance_x(&pos);
                 let dist_y = hit.distance_y(&pos);
-                if dist_x == 1 && dist_y == 1 && ptype == PieceType::King {
+                if (dist_x + dist_y == 1) && ptype == PieceType::King {
                     return true;
                 }
             }
