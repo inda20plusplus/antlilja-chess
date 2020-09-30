@@ -25,6 +25,10 @@ impl Pos {
         self.0 as usize
     }
 
+    pub fn index_u8(&self) -> u8 {
+        self.0
+    }
+
     pub fn xy(&self) -> (u8, u8) {
         (self.x(), self.y())
     }
