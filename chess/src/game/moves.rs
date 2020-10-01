@@ -37,7 +37,9 @@ mod inner {
             // First move, double forward
             if from.at_pawn_rank(self.player) {
                 if let Some(to) = from.move_y(y_dir * 2) {
-                    if self.at_pos(to).is_empty() {
+                    if self.at_pos(to).is_empty()
+                        && self.at_pos(from.move_y(y_dir).unwrap()).is_empty()
+                    {
                         let r#move = Move::Move(to);
                         if !self.king_in_danger_after_move(from, r#move) {
                             self.move_map.insert(r#move);
