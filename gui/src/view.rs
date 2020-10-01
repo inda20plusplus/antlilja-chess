@@ -104,12 +104,20 @@ impl View {
     }
 
     pub fn render(&mut self, controller: &GameController, c: Context, g: &mut G2d) {
-        let board_size = self.settings.board_size;
-        let padding = self.settings.padding;
-
         // Draw background
         clear(self.settings.background_color, g);
 
+        // Draw board
+        self.draw_board(&controller, &c, g);
+
+        }
+    }
+
+    fn draw_board(&mut self, controller: &GameController, c: &Context, g: &mut G2d) {
+        let board_size = self.settings.board_size;
+        let padding = self.settings.padding;
+
+        // Draw border
         rectangle(
             self.settings.border_color,
             [padding, 0.0, board_size, board_size],
@@ -117,7 +125,7 @@ impl View {
             g,
         );
 
-        // Draw board
+        // Draw cells
         let cell_size = (board_size - 4.0) / 8.0;
         for x in 0..8 {
             for y in 0..8 {
