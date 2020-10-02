@@ -1,4 +1,4 @@
-use crate::game_controller::GameController;
+use crate::game_controller::{GameController, State};
 use chess::{Color, Pos};
 use piston_window::{self, clear, ellipse, rectangle, Context, G2d, G2dTexture, Image};
 use std::path::Path;
@@ -114,6 +114,9 @@ impl View {
         // Draw board
         self.draw_board(&controller, &c, g);
 
+        match &controller.state {
+            State::Promotion(_) => self.draw_promotion_choice(&controller, &c, g),
+            _ => (),
         }
     }
 
@@ -176,5 +179,73 @@ impl View {
                 }
             }
         }
+    }
+
+    fn draw_promotion_choice(&mut self, controller: &GameController, c: &Context, g: &mut G2d) {
+        // Dim everything else
+        let mut dim = self.settings.background_color;
+        dim[3] = 0.5;
+        let [w, h] = c.get_view_size();
+        rectangle(
+            dim,
+            [0.0, 0.0, w, h],
+            c.transform,
+            g
+        );
+
+        // Draw choices
+        let x_padding = self.settings.padding + (self.settings.board_size - self.settings.promotion_width) / 2.0;
+        let y_padding = (self.settings.board_size - self.settings.promotion_height) / 2.0;
+
+        rectangle(
+            self.settings.border_color,
+            [x_padding, y_padding, self.settings.promotion_width, self.settings.promotion_width],
+            c.transform,
+            g
+        );
+
+        let cell_size = 120.0;
+
+        let base_index = match controller.game.current_color() {
+            Color::White => -1,
+            Color::Black => 5,
+        };
+
+        for x in 0..2 {
+            for y in 0..2 {
+                let current_color = if x % 2 == y % 2 {
+                    self.settings.black_color
+                } else {
+                    self.settings.white_color
+                };
+
+                let x_pos = x_padding + 4.0 + cell_size * x as f64;
+                let y_pos = y_padding + 4.0 + cell_size * y as f64;
+                let cell = [x_pos, y_pos, cell_size, cell_size];
+
+                rectangle(current_color, cell, c.transform, g);
+
+
+                let index = if x == 0 && y == 0 {
+                    base_index + 5 // Queen
+                } else if x == 0 && y == 1 {
+                    base_index + 2 // Rook
+                } else if x == 1 && y == 0 {
+                    base_index + 3 // Knight
+                } else {
+                    base_index + 4 // Bishop
+                };
+                
+                let image = Image::new().rect([x_pos, y_pos, cell_size, cell_size]);
+
+                image.draw(
+                    &mut self.textures[index as usize],
+                    &piston_window::DrawState::default(),
+                    c.transform,
+                    g,
+                )
+            }
+        }
+        
     }
 }
