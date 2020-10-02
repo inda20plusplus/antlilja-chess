@@ -12,6 +12,8 @@ const COLOR_5: [f32; 4] = [0.15, 0.12, 0.10, 1.0];
 pub struct ViewSettings {
     pub board_size: f64,
     pub padding: f64,
+    pub promotion_width: f64,
+    pub promotion_height: f64,
     pub background_color: [f32; 4],
     pub border_color: [f32; 4],
     pub white_color: [f32; 4],
@@ -24,6 +26,8 @@ impl Default for ViewSettings {
         ViewSettings {
             board_size: 640.0,
             padding: 192.0,
+            promotion_width: 248.0,
+            promotion_height: 248.0,
             background_color: COLOR_3,
             border_color: COLOR_5,
             white_color: COLOR_1,
