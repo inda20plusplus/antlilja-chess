@@ -1,6 +1,5 @@
-use chess::game::Game;
-use chess::Move;
-use chess::Pos;
+use chess::game::{Game, GameResult};
+use chess::{Color, Move, Pos};
 use crate::view::ViewSettings;
 use piston_window::{Button, GenericEvent, MouseButton};
 use std::collections::HashMap;
