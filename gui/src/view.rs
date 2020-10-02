@@ -9,6 +9,7 @@ const COLOR_3: [f32; 4] = [0.34, 0.31, 0.31, 1.0];
 const COLOR_4: [f32; 4] = [0.58, 0.59, 0.63, 1.0];
 const COLOR_5: [f32; 4] = [0.15, 0.12, 0.10, 1.0];
 
+#[derive(Copy, Clone)]
 pub struct ViewSettings {
     pub board_size: f64,
     pub padding: f64,
