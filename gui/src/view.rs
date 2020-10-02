@@ -176,22 +176,23 @@ impl View {
         let mut dim = self.settings.background_color;
         dim[3] = 0.5;
         let [w, h] = c.get_view_size();
-        rectangle(
-            dim,
-            [0.0, 0.0, w, h],
-            c.transform,
-            g
-        );
+        rectangle(dim, [0.0, 0.0, w, h], c.transform, g);
 
         // Draw choices
-        let x_padding = self.settings.padding + (self.settings.board_size - self.settings.promotion_width) / 2.0;
+        let x_padding = self.settings.padding
+            + (self.settings.board_size - self.settings.promotion_width) / 2.0;
         let y_padding = (self.settings.board_size - self.settings.promotion_height) / 2.0;
 
         rectangle(
             self.settings.border_color,
-            [x_padding, y_padding, self.settings.promotion_width, self.settings.promotion_width],
+            [
+                x_padding,
+                y_padding,
+                self.settings.promotion_width,
+                self.settings.promotion_width,
+            ],
             c.transform,
-            g
+            g,
         );
 
         let cell_size = 120.0;
@@ -215,7 +216,6 @@ impl View {
 
                 rectangle(current_color, cell, c.transform, g);
 
-
                 let index = if x == 0 && y == 0 {
                     base_index + 5 // Queen
                 } else if x == 0 && y == 1 {
@@ -225,7 +225,7 @@ impl View {
                 } else {
                     base_index + 4 // Bishop
                 };
-                
+
                 let image = Image::new().rect([x_pos, y_pos, cell_size, cell_size]);
 
                 image.draw(
@@ -236,6 +236,5 @@ impl View {
                 )
             }
         }
-        
     }
 }

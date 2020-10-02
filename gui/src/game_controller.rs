@@ -1,6 +1,6 @@
-use chess::game::{Game, GameResult};
-use chess::{Color, Move, Pos, PieceType};
 use crate::view::ViewSettings;
+use chess::game::{Game, GameResult};
+use chess::{Color, Move, PieceType, Pos};
 use piston_window::{Button, GenericEvent, MouseButton};
 use std::collections::HashMap;
 
@@ -17,7 +17,6 @@ impl ToString for Ending {
             Ending::Black => "Black Wins!".to_string(),
             Ending::Tie => "It's a Tie!".to_string(),
         }
-
     }
 }
 
@@ -100,7 +99,7 @@ impl GameController {
         let y = self.cursor_pos[1] - pos[1] - 4.0;
 
         if let State::Promotion(pos) = self.state {
-            if x >= 0.0 && x < width && y >= 0.0 && y < height{
+            if x >= 0.0 && x < width && y >= 0.0 && y < height {
                 let cell_x = (x / width * 2.0) as usize;
                 let cell_y = (y / height * 2.0) as usize;
 
@@ -133,7 +132,9 @@ impl GameController {
                     self.state = State::End(color);
                 }
                 GameResult::Stalemate => self.state = State::End(Ending::Tie),
-                GameResult::InvalidMove => panic!("Move was in current move but game returned InvalidMove")
+                GameResult::InvalidMove => {
+                    panic!("Move was in current move but game returned InvalidMove")
+                }
             }
 
             self.selected_square = None;
@@ -156,7 +157,9 @@ impl GameController {
                                 moves.insert([pos.x() as usize, pos.y() as usize], *r#move);
                             }
                             Move::PawnPromotion(_, pos) => {
-                                moves.entry([pos.x() as usize, pos.y() as usize]).or_insert(*r#move);
+                                moves
+                                    .entry([pos.x() as usize, pos.y() as usize])
+                                    .or_insert(*r#move);
                             }
                             Move::KingSideCastling => {
                                 moves.insert([position[0] + 2, position[1]], *r#move);
