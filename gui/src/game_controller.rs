@@ -1,5 +1,5 @@
 use chess::game::{Game, GameResult};
-use chess::{Color, Move, Pos};
+use chess::{Color, Move, Pos, PieceType};
 use crate::view::ViewSettings;
 use piston_window::{Button, GenericEvent, MouseButton};
 use std::collections::HashMap;
@@ -56,6 +56,7 @@ impl GameController {
         if let Some(Button::Mouse(MouseButton::Left)) = e.press_args() {
             match self.state {
                 State::Playing => self.play_input(),
+                State::Promotion(_) => self.promotion_choice(),
                 _ => (),
             }
         }
@@ -75,6 +76,7 @@ impl GameController {
             if let Some(moves) = self.current_moves.clone() {
                 if let Some(r#move) = moves.get(&[cell_x, cell_y]) {
                     if let Move::PawnPromotion(_, pos) = r#move {
+                        self.state = State::Promotion(Pos::new_index(pos.index() as u8));
                     } else {
                         self.execute_move(r#move);
                     }
@@ -89,6 +91,33 @@ impl GameController {
         }
     }
 
+    fn promotion_choice(&mut self) {
+        let width = self.settings.promotion_width;
+        let height = self.settings.promotion_height;
+        let pos = self.settings.promotion_pos();
+
+        let x = self.cursor_pos[0] - pos[0] - 4.0;
+        let y = self.cursor_pos[1] - pos[1] - 4.0;
+
+        if let State::Promotion(pos) = self.state {
+            if x >= 0.0 && x < width && y >= 0.0 && y < height{
+                let cell_x = (x / width * 2.0) as usize;
+                let cell_y = (y / height * 2.0) as usize;
+
+                let r#move = if cell_x == 0 && cell_y == 0 {
+                    Move::PawnPromotion(PieceType::Queen, pos)
+                } else if cell_x == 1 && cell_y == 0 {
+                    Move::PawnPromotion(PieceType::Knight, pos)
+                } else if cell_x == 0 && cell_y == 1 {
+                    Move::PawnPromotion(PieceType::Rook, pos)
+                } else {
+                    Move::PawnPromotion(PieceType::Bishop, pos)
+                };
+
+                self.execute_move(&r#move);
+            }
+        }
+    }
 
     fn execute_move(&mut self, r#move: &Move) {
         if let Some(from) = self.selected_square {
