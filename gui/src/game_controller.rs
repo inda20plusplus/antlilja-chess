@@ -11,6 +11,17 @@ pub enum Ending {
     Tie,
 }
 
+impl ToString for Ending {
+    fn to_string(&self) -> String {
+        match self {
+            Ending::White => "White Wins!".to_string(),
+            Ending::Black => "Black Wins!".to_string(),
+            Ending::Tie => "It's a Tie!".to_string(),
+        }
+
+    }
+}
+
 pub enum State {
     Playing,
     Promotion(Pos),
