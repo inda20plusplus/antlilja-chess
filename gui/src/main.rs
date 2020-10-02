@@ -8,7 +8,7 @@ use piston_window::*;
 
 fn main() {
     let game = Game::default();
-    
+
     let view_settings = ViewSettings::default();
 
     let mut controller = GameController::new(game, view_settings);
