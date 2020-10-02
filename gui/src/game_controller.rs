@@ -73,7 +73,7 @@ impl GameController {
             let cell_x = (x / board_size * 8.0) as usize;
             let cell_y = 7 - (y / board_size * 8.0) as usize;
 
-            if let Some(moves) = &self.current_moves {
+            if let Some(moves) = self.current_moves.clone() {
                 if let Some(r#move) = moves.get(&[cell_x, cell_y]) {
 
                     let from = self.selected_square.unwrap();
