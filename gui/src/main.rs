@@ -8,13 +8,15 @@ use piston_window::*;
 
 fn main() {
     let game = Game::default();
+    
+    let view_settings = ViewSettings::default();
 
-    let mut controller = GameController::new(game);
+    let mut controller = GameController::new(game, view_settings);
 
     let mut window: PistonWindow = WindowSettings::new("Chess", [1024, 640]).build().unwrap();
 
     let textures = View::create_textures(&mut window);
-    let mut view = View::new(ViewSettings::default(), textures);
+    let mut view = View::new(view_settings, textures);
 
     window.set_lazy(true);
     while let Some(event) = window.next() {
