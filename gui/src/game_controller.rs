@@ -75,25 +75,10 @@ impl GameController {
 
             if let Some(moves) = self.current_moves.clone() {
                 if let Some(r#move) = moves.get(&[cell_x, cell_y]) {
-
-                    let from = self.selected_square.unwrap();
-                    let turn_result = self.game.play_xy(from[0] as u8, from[1] as u8, *r#move);
-
-                    match turn_result {
-                        GameResult::Ok => (),
-                        GameResult::Checkmate => {
-                            let color = match self.game.current_color() {
-                                Color::White => Ending::White,
-                                Color::Black => Ending::Black,
-                            };
-                            self.state = State::End(color);
-                        }
-                        GameResult::Stalemate => self.state = State::End(Ending::Tie),
-                        GameResult::InvalidMove => panic!("Move was in current move but game returned InvalidMove")
+                    if let Move::PawnPromotion(_, pos) = r#move {
+                    } else {
+                        self.execute_move(r#move);
                     }
-
-                    self.selected_square = None;
-                    self.current_moves = None;
                 } else {
                     self.selected_square = Some([cell_x, cell_y]);
                     self.get_current_moves();
@@ -102,6 +87,29 @@ impl GameController {
                 self.selected_square = Some([cell_x, cell_y]);
                 self.get_current_moves();
             }
+        }
+    }
+
+
+    fn execute_move(&mut self, r#move: &Move) {
+        if let Some(from) = self.selected_square {
+            let turn_result = self.game.play_xy(from[0] as u8, from[1] as u8, *r#move);
+
+            match turn_result {
+                GameResult::Ok => (),
+                GameResult::Checkmate => {
+                    let color = match self.game.current_color() {
+                        Color::White => Ending::White,
+                        Color::Black => Ending::Black,
+                    };
+                    self.state = State::End(color);
+                }
+                GameResult::Stalemate => self.state = State::End(Ending::Tie),
+                GameResult::InvalidMove => panic!("Move was in current move but game returned InvalidMove")
+            }
+
+            self.selected_square = None;
+            self.current_moves = None;
         }
     }
 
