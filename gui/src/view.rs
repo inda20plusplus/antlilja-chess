@@ -111,12 +111,12 @@ impl View {
 
     fn draw_board(&mut self, controller: &GameController, c: &Context, g: &mut G2d) {
         let board_size = self.settings.board_size;
-        let padding = self.settings.padding;
+        let board_pos = self.settings.board_pos();
 
         // Draw border
         rectangle(
             self.settings.border_color,
-            [padding, 0.0, board_size, board_size],
+            [board_pos[0], board_pos[1], board_size, board_size],
             c.transform,
             g,
         );
@@ -137,8 +137,8 @@ impl View {
                     }
                 };
 
-                let x_pos = padding + 2.0 + cell_size * x as f64;
-                let y_pos = 2.0 + cell_size * (7.0 - y as f64);
+                let x_pos = board_pos[0] + 2.0 + cell_size * x as f64;
+                let y_pos = board_pos[1] + 2.0 + cell_size * (7.0 - y as f64);
                 let cell = [x_pos, y_pos, cell_size, cell_size];
 
                 rectangle(current_color, cell, c.transform, g);

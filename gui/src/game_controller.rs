@@ -64,7 +64,7 @@ impl GameController {
 
     fn play_input(&mut self) {
         let board_size = self.settings.board_size;
-        let board_pos = [self.settings.padding, 0.0];
+        let board_pos = self.settings.board_pos();
 
         let x = self.cursor_pos[0] - board_pos[0] - 2.0;
         let y = self.cursor_pos[1] - board_pos[1] - 2.0;
