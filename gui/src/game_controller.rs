@@ -95,7 +95,7 @@ impl GameController {
             let turn_result = self.game.play_xy(from[0] as u8, from[1] as u8, *r#move);
 
             match turn_result {
-                GameResult::Ok => (),
+                GameResult::Ok => self.state = State::Playing,
                 GameResult::Checkmate => {
                     let color = match self.game.current_color() {
                         Color::White => Ending::White,
