@@ -21,6 +21,19 @@ pub struct ViewSettings {
     pub move_color: [f32; 4],
 }
 
+impl ViewSettings {
+    pub fn board_pos(&self) -> [f64; 2] {
+        [self.padding, 0.0]
+    }
+
+    pub fn promotion_pos(&self) -> [f64; 2] {
+        let x_padding = self.padding + (self.board_size - self.promotion_width) / 2.0;
+        let y_padding = (self.board_size - self.promotion_height) / 2.0;
+
+        [x_padding, y_padding]
+    }
+}
+
 impl Default for ViewSettings {
     fn default() -> ViewSettings {
         ViewSettings {
