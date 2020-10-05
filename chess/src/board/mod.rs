@@ -143,7 +143,7 @@ impl Board {
             let mut i: i8 = 1;
             loop {
                 if let Some(new_pos) = pos.move_xy(dir_x * i, dir_y * i) {
-                    let piece = self.at_pos(pos);
+                    let piece = self.at_pos(new_pos);
 
                     if !piece.is_empty() {
                         if piece.color() == color {
