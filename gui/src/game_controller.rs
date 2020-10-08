@@ -56,10 +56,12 @@ impl GameController {
         }
 
         if let Some(Button::Mouse(MouseButton::Left)) = e.press_args() {
-            match self.state {
-                State::Playing => self.play_input(),
-                State::Promotion(_) => self.promotion_choice(),
-                _ => (),
+            if self.local_play_is_allowed() {
+                match self.state {
+                    State::Playing => self.play_input(),
+                    State::Promotion(_) => self.promotion_choice(),
+                    _ => (),
+                }
             }
         }
     }
