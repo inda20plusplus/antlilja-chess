@@ -1,3 +1,4 @@
+use crate::network::Hosting;
 use crate::view::ViewSettings;
 use chess::game::{Game, GameResult};
 use chess::{Color, Move, PieceType, Pos};
@@ -29,6 +30,7 @@ pub enum State {
 pub struct GameController {
     pub game: Game,
     pub state: State,
+    hosting: Hosting,
     settings: ViewSettings,
     pub selected_square: Option<[usize; 2]>,
     pub current_moves: Option<HashMap<[usize; 2], Move>>,
@@ -36,10 +38,11 @@ pub struct GameController {
 }
 
 impl GameController {
-    pub fn new(game: Game, settings: ViewSettings) -> GameController {
+    pub fn new(game: Game, hosting: Hosting, settings: ViewSettings) -> GameController {
         GameController {
             game,
             state: State::Playing,
+            hosting,
             settings,
             selected_square: None,
             current_moves: None,

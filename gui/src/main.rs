@@ -3,15 +3,18 @@ extern crate gui;
 
 use chess::game::Game;
 use gui::game_controller::GameController;
+use gui::network::Hosting;
 use gui::view::{View, ViewSettings};
 use piston_window::*;
 
 fn main() {
+    let hosting = Hosting::Local;
+
     let game = Game::default();
 
     let view_settings = ViewSettings::default();
 
-    let mut controller = GameController::new(game, view_settings);
+    let mut controller = GameController::new(game, hosting, view_settings);
 
     let mut window: PistonWindow = WindowSettings::new("Chess", [1024, 640]).build().unwrap();
 
