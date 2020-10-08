@@ -64,6 +64,17 @@ impl GameController {
         }
     }
 
+    fn local_play_is_allowed(&self) -> bool {
+        let color = self.game.current_color();
+
+        match self.hosting {
+            Hosting::Remote { is_host } => {
+                is_host && color == Color::White || !is_host && color == Color::Black
+            }
+            Hosting::Local => true,
+        }
+    }
+
     fn play_input(&mut self) {
         let board_size = self.settings.board_size;
         let board_pos = self.settings.board_pos();
