@@ -47,7 +47,7 @@ impl GameController {
         }
     }
 
-    pub fn event<E: GenericEvent>(&mut self, board_pos: [f64; 2], board_size: f64, e: &E) {
+    pub fn event<E: GenericEvent>(&mut self, e: &E) {
         if let Some(mouse_pos) = e.mouse_cursor_args() {
             self.cursor_pos = mouse_pos;
         }
