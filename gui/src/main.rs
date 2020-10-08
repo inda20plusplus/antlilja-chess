@@ -21,7 +21,6 @@ fn main() {
     let textures = View::create_textures(&mut window);
     let mut view = View::new(view_settings, textures);
 
-    window.set_lazy(true);
     while let Some(event) = window.next() {
         controller.event(&event);
 
