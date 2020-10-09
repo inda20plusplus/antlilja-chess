@@ -153,10 +153,9 @@ impl View {
                 let piece = controller.game.at_pos(Pos::new_xy(x as u8, y as u8));
 
                 if !piece.is_empty() {
-                    let index = if piece.color() == Color::White {
-                        piece.get_type() as u8 - 1
-                    } else {
-                        piece.get_type() as u8 + 5
+                    let index = match piece.color() {
+                        Color::White => piece.get_type() as u8 - 1,
+                        Color::Black => piece.get_type() as u8 + 5,
                     };
                     let image = Image::new().rect([x_pos, y_pos, cell_size, cell_size]);
 
