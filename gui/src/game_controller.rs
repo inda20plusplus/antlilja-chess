@@ -1,4 +1,4 @@
-use crate::network::Hosting;
+use crate::network::ConnectionHandler;
 use crate::view::ViewSettings;
 use chess::game::{Game, GameResult};
 use chess::{Color, Move, PieceType, Pos};
@@ -30,7 +30,7 @@ pub enum State {
 pub struct GameController {
     pub game: Game,
     pub state: State,
-    hosting: Hosting,
+    connection_handler: Option<ConnectionHandler>,
     settings: ViewSettings,
     pub selected_square: Option<[usize; 2]>,
     pub current_moves: Option<HashMap<[usize; 2], Move>>,
@@ -38,11 +38,15 @@ pub struct GameController {
 }
 
 impl GameController {
-    pub fn new(game: Game, hosting: Hosting, settings: ViewSettings) -> GameController {
+    pub fn new(
+        game: Game,
+        connection_handler: Option<ConnectionHandler>,
+        settings: ViewSettings,
+    ) -> GameController {
         GameController {
             game,
             state: State::Playing,
-            hosting,
+            connection_handler,
             settings,
             selected_square: None,
             current_moves: None,
@@ -69,11 +73,12 @@ impl GameController {
     fn local_play_is_allowed(&self) -> bool {
         let color = self.game.current_color();
 
-        match self.hosting {
-            Hosting::Remote { is_host } => {
-                is_host && color == Color::White || !is_host && color == Color::Black
+        match self.connection_handler {
+            Some(handler) => {
+                handler.is_host && color == Color::White
+                    || !handler.is_host && color == Color::Black
             }
-            Hosting::Local => true,
+            None => true,
         }
     }
 
