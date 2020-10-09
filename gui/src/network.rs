@@ -130,9 +130,6 @@ pub struct ConnectionHandler {
 }
 
 impl ConnectionHandler {
-    pub fn connect(ip: IpAddr, port: u8) -> Self {
-    }
-
     pub fn new(stream: TcpStream, is_host: bool) -> Self {
         let mut handler = Self {
             is_host, 
@@ -144,6 +141,12 @@ impl ConnectionHandler {
         handler.read_handle = Some(handler.spawn_read_thread());
 
         handler
+    }
+
+    pub fn connect(ip: IpAddr, port: u8) -> Self {
+        let stream = TcpStream::connect(format!("{}:{}", ip, port)).unwrap();
+
+        Self::new(stream, false)
     }
 
     pub fn host(port: u8) -> Self {
