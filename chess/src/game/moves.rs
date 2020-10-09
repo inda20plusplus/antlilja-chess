@@ -63,11 +63,10 @@ mod inner {
                     }
                 }
                 // En passant
-                else if self.last_move.0 != Pos::invalid() {
-                    let (last_from, last_move) = self.last_move;
+                else if let Some((_, last_from, last_move)) = self.history.last() {
                     if let Move::Move(last_to) = last_move {
                         if last_from.distance_y(&last_to) == 2 {
-                            let space = self.at_pos(last_to);
+                            let space = self.at_pos(*last_to);
                             if !space.is_empty()
                                 && space.color() != self.player
                                 && space.get_type() == PieceType::Pawn
