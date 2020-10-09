@@ -25,6 +25,17 @@ impl MoveType {
             MoveType::QueensideCastle => vec![0x4],
         }
     }
+
+    pub fn from_bytes(bytes: [u8; 4]) -> Result<MoveType, &'static str> {
+        match bytes[0] {
+            0x0 => Ok(MoveType::Standard(bytes[1], bytes[2])),
+            0x1 => Ok(MoveType::EnPassant(bytes[1], bytes[2])),
+            0x2 => Ok(MoveType::Promotion(bytes[1], bytes[2], bytes[3])),
+            0x3 => Ok(MoveType::KingsideCastle),
+            0x4 => Ok(MoveType::QueensideCastle),
+            _ => Err("Byte is not valid move type"),
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -56,6 +67,22 @@ impl Message {
         };
 
         bytes
+    }
+
+    pub fn from_bytes(bytes: [u8; 5]) -> Result<Self, &'static str> {
+        match bytes[0] {
+            0x0 => Ok(Message::Decline),
+            0x1 => {
+                let move_bytes: [u8; 4] = [bytes[1], bytes[2], bytes[3], bytes[4]];
+                Ok(Message::Move(MoveType::from_bytes(move_bytes).unwrap()))
+            }
+            0x2 => Ok(Message::Undo),
+            0x3 => Ok(Message::Accept),
+            0x4 => Ok(Message::Checkmate),
+            0x5 => Ok(Message::Draw),
+            0x6 => Ok(Message::Resign),
+            _ => Err("Byte is not valid message type"),
+        }
     }
 }
 
