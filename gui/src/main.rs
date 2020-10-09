@@ -8,14 +8,19 @@ use gui::view::{View, ViewSettings};
 use piston_window::*;
 use std::io::{self, Read};
 
-fn main() {
+fn get_input() -> String {
     let mut input = String::new();
-    println!("Enter if game is Local or Remote\nFormat: local | host | remote");
+
     io::stdin()
         .read_to_string(&mut input)
         .expect("Failed to read input");
 
-    let connection = match &input.trim()[..] {
+    input.trim()
+}
+
+fn main() {
+    println!("Enter if game is Local or Remote\nFormat: local | host | remote");
+    let connection = match &get_input()[..] {
         "local" => None,
         "host" => Some(ConnectionHandler { is_host: true }),
         "remote" => Some(ConnectionHandler { is_host: false }),
