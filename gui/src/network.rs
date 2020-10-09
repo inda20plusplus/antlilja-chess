@@ -5,4 +5,5 @@ pub enum Hosting {
 }
 
 pub struct ConnectionHandler {
+    is_host: bool,
 }
