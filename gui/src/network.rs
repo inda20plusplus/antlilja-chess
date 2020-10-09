@@ -1,3 +1,4 @@
+use chess::{Move, PieceType, Pos};
 use std::collections::VecDeque;
 use std::io::prelude::*;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, TcpListener, TcpStream};
@@ -34,6 +35,41 @@ impl MoveType {
             0x3 => Ok(MoveType::KingsideCastle),
             0x4 => Ok(MoveType::QueensideCastle),
             _ => Err("Byte is not valid move type"),
+        }
+    }
+
+    pub fn to_chess_move(&self) -> (Option<Pos>, Move) {
+        match self {
+            MoveType::Standard(origin, target) => {
+                let pos = Pos::new_index(*origin);
+                let r#move = Move::Move(Pos::new_index(*target));
+
+                (Some(pos), r#move)
+            }
+
+            MoveType::EnPassant(origin, target) => {
+                let pos = Pos::new_index(*origin);
+                let r#move = Move::EnPassant(Pos::new_index(*target));
+
+                (Some(pos), r#move)
+            }
+
+            MoveType::Promotion(origin, target, piece_type) => {
+                let pos = Pos::new_index(*origin);
+                let r#type = match piece_type {
+                    0x0 => PieceType::Knight,
+                    0x1 => PieceType::Bishop,
+                    0x2 => PieceType::Rook,
+                    0x3 => PieceType::Queen,
+                    _ => panic!("Invalid PieceType when converting to chess::Move"),
+                };
+                let r#move = Move::PawnPromotion(r#type, Pos::new_index(*target));
+
+                (Some(pos), r#move)
+            }
+
+            MoveType::KingsideCastle => (None, Move::KingSideCastling),
+            MoveType::QueensideCastle => (None, Move::QueenSideCastling),
         }
     }
 }
