@@ -1,7 +1,7 @@
 use chess::{Move, PieceType, Pos};
 use std::collections::VecDeque;
 use std::io::prelude::*;
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, TcpListener, TcpStream};
+use std::net::{IpAddr, TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
