@@ -39,52 +39,48 @@ pub struct TaggedPiece(u8);
 
 impl PartialEq for TaggedPiece {
     fn eq(&self, other: &Self) -> bool {
-        return (self.0 & 191) == (other.0 & 191);
+        (self.0 & 191) == (other.0 & 191)
     }
 }
 
 impl TaggedPiece {
     pub fn empty() -> Self {
-        return TaggedPiece { 0: 0 };
+        TaggedPiece { 0: 0 }
     }
 
     pub fn new(r#type: PieceType, color: Color) -> Self {
-        return TaggedPiece {
+        TaggedPiece {
             0: (r#type as u8) ^ (color as u8),
-        };
+        }
     }
 
     pub fn original(r#type: PieceType, color: Color) -> Self {
-        return TaggedPiece {
+        TaggedPiece {
             0: ((r#type as u8) ^ (color as u8)) ^ 64,
-        };
+        }
     }
 
     pub fn non_original(&self) -> Self {
-        return TaggedPiece { 0: self.0 & 191 };
+        TaggedPiece { 0: self.0 & 191 }
     }
 
     pub fn is_empty(&self) -> bool {
-        return self.0 == 0;
+        self.0 == 0
     }
 
     pub fn is_original(&self) -> bool {
-        return (self.0 & 64) == 64;
+        (self.0 & 64) == 64
     }
 
     pub fn get_type(&self) -> PieceType {
-        unsafe {
-            return std::mem::transmute(self.0 & 63);
-        }
+        unsafe { std::mem::transmute(self.0 & 63) }
     }
 
     pub fn color(&self) -> Color {
-        unsafe {
-            return std::mem::transmute(self.0 & 128);
-        }
+        unsafe { std::mem::transmute(self.0 & 128) }
     }
 
     pub fn opposite_color(&self) -> Self {
-        return TaggedPiece { 0: self.0 ^ 128 };
+        TaggedPiece { 0: self.0 ^ 128 }
     }
 }
