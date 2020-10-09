@@ -127,14 +127,16 @@ pub struct ConnectionHandler {
     stream: Arc<Mutex<TcpStream>>,
     recieved_messages: Arc<Mutex<VecDeque<[u8; 5]>>>,
     read_handle: Option<thread::JoinHandle<()>>,
+    pub last_sent: Option<Message>,
 }
 
 impl ConnectionHandler {
     pub fn new(stream: TcpStream, is_host: bool) -> Self {
         let mut handler = Self {
-            is_host, 
+            is_host,
             stream: Arc::new(Mutex::new(stream)),
             recieved_messages: Arc::new(Mutex::new(VecDeque::with_capacity(10))),
+            last_sent: None,
             read_handle: None,
         };
 
