@@ -130,6 +130,9 @@ pub struct ConnectionHandler {
 }
 
 impl ConnectionHandler {
+    pub fn connect(ip: IpAddr, port: u8) -> Self {
+    }
+
     pub fn host(port: u8) -> Self {
         let listener = TcpListener::bind(format!("127.0.0.1:{}", port)).unwrap();
         let (stream, _addr) = listener.accept().unwrap();
