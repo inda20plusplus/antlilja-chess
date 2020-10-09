@@ -16,7 +16,7 @@ fn get_input() -> String {
         .read_to_string(&mut input)
         .expect("Failed to read input");
 
-    input.trim()
+    input.trim().to_string()
 }
 
 fn main() {
