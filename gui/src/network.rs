@@ -178,4 +178,11 @@ impl ConnectionHandler {
             drop(queue);
         })
     }
+
+    fn write_message(&mut self, message: Message) -> std::io::Result<()> {
+        let stream_mutex = Arc::clone(&self.stream);
+        let mut stream = stream_mutex.lock().unwrap();
+
+        stream.write_all(&message.to_bytes())
+    }
 }
