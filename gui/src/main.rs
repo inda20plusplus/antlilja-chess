@@ -20,11 +20,7 @@ fn main() {
 
     window.set_lazy(true);
     while let Some(event) = window.next() {
-        controller.event(
-            [view.settings.padding, 0.0],
-            view.settings.board_size,
-            &event,
-        );
+        controller.event(&event);
 
         window.draw_2d(&event, |context, graphics, _| {
             view.render(&controller, context, graphics);
