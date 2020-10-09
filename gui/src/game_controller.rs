@@ -73,7 +73,7 @@ impl GameController {
     fn local_play_is_allowed(&self) -> bool {
         let color = self.game.current_color();
 
-        match self.connection_handler {
+        match &self.connection_handler {
             Some(handler) => {
                 handler.is_host && color == Color::White
                     || !handler.is_host && color == Color::Black
