@@ -133,12 +133,9 @@ impl ConnectionHandler {
     pub fn connect(ip: IpAddr, port: u8) -> Self {
     }
 
-    pub fn host(port: u8) -> Self {
-        let listener = TcpListener::bind(format!("127.0.0.1:{}", port)).unwrap();
-        let (stream, _addr) = listener.accept().unwrap();
-
+    pub fn new(stream: TcpStream, is_host: bool) -> Self {
         let mut handler = Self {
-            is_host: true,
+            is_host, 
             stream: Arc::new(Mutex::new(stream)),
             recieved_messages: Arc::new(Mutex::new(VecDeque::with_capacity(10))),
             read_handle: None,
@@ -147,6 +144,13 @@ impl ConnectionHandler {
         handler.read_handle = Some(handler.spawn_read_thread());
 
         handler
+    }
+
+    pub fn host(port: u8) -> Self {
+        let listener = TcpListener::bind(format!("127.0.0.1:{}", port)).unwrap();
+        let (stream, _addr) = listener.accept().unwrap();
+
+        Self::new(stream, true)
     }
 
     fn spawn_read_thread(&mut self) -> thread::JoinHandle<()> {
