@@ -3,18 +3,30 @@ extern crate gui;
 
 use chess::game::Game;
 use gui::game_controller::GameController;
-use gui::network::Hosting;
+use gui::network::ConnectionHandler;
 use gui::view::{View, ViewSettings};
 use piston_window::*;
+use std::io::{self, Read};
 
 fn main() {
-    let hosting = Hosting::Local;
+    let mut input = String::new();
+    println!("Enter if game is Local or Remote\nFormat: local | host | remote");
+    io::stdin()
+        .read_to_string(&mut input)
+        .expect("Failed to read input");
+
+    let connection = match &input.trim()[..] {
+        "local" => None,
+        "host" => Some(ConnectionHandler { is_host: true }),
+        "remote" => Some(ConnectionHandler { is_host: false }),
+        _ => panic!("Invalid input"),
+    };
 
     let game = Game::default();
 
     let view_settings = ViewSettings::default();
 
-    let mut controller = GameController::new(game, hosting, view_settings);
+    let mut controller = GameController::new(game, connection, view_settings);
 
     let mut window: PistonWindow = WindowSettings::new("Chess", [1024, 640]).build().unwrap();
 
