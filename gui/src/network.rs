@@ -13,6 +13,20 @@ pub enum MoveType {
     QueensideCastle,
 }
 
+impl MoveType {
+    pub fn to_bytes(&self) -> Vec<u8> {
+        match self {
+            MoveType::Standard(origin, target) => vec![0x0, *origin, *target],
+            MoveType::EnPassant(origin, target) => vec![0x1, *origin, *target],
+            MoveType::Promotion(origin, target, piece_type) => {
+                vec![0x2, *origin, *target, *piece_type]
+            }
+            MoveType::KingsideCastle => vec![0x3],
+            MoveType::QueensideCastle => vec![0x4],
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Message {
     Decline,
@@ -22,6 +36,27 @@ pub enum Message {
     Checkmate,
     Draw,
     Resign,
+}
+
+impl Message {
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut bytes = vec![0x0];
+
+        match self {
+            Message::Decline => bytes[0] = 0x0,
+            Message::Move(move_type) => {
+                bytes[0] = 0x1;
+                bytes.append(&mut move_type.to_bytes());
+            }
+            Message::Undo => bytes[0] = 0x2,
+            Message::Accept => bytes[0] = 0x3,
+            Message::Checkmate => bytes[0] = 0x4,
+            Message::Draw => bytes[0] = 0x5,
+            Message::Resign => bytes[0] = 0x6,
+        };
+
+        bytes
+    }
 }
 
 pub struct ConnectionHandler {
