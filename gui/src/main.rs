@@ -23,8 +23,8 @@ fn main() {
     println!("Enter if game is Local or Remote\nFormat: local | host | remote");
     let connection = match &get_input()[..] {
         "local" => None,
-        "host" => Some(ConnectionHandler::host(24337)),
-        "remote" => Some(ConnectionHandler::connect("127.0.0.1".parse().unwrap(), 24337u32)),
+        "host" => Some(ConnectionHandler::host(24337u16)),
+        "remote" => Some(ConnectionHandler::connect("127.0.0.1".parse().unwrap(), 24337u16)),
         _ => panic!("Invalid input"),
     };
 

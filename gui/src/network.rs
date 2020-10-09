@@ -143,13 +143,13 @@ impl ConnectionHandler {
         handler
     }
 
-    pub fn connect(ip: IpAddr, port: u8) -> Self {
+    pub fn connect(ip: IpAddr, port: u16) -> Self {
         let stream = TcpStream::connect(format!("{}:{}", ip, port)).unwrap();
 
         Self::new(stream, false)
     }
 
-    pub fn host(port: u8) -> Self {
+    pub fn host(port: u16) -> Self {
         let listener = TcpListener::bind(format!("127.0.0.1:{}", port)).unwrap();
         let (stream, _addr) = listener.accept().unwrap();
 
