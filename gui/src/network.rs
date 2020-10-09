@@ -1,4 +1,23 @@
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum MoveType {
+    Standard(u8, u8),
+    EnPassant(u8, u8),
+    Promotion(u8, u8, u8),
+    KingsideCastle,
+    QueensideCastle,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Message {
+    Decline,
+    Move(MoveType),
+    Undo,
+    Accept,
+    Checkmate,
+    Draw,
+    Resign,
+}
 
 pub struct ConnectionHandler {
     is_host: bool,
