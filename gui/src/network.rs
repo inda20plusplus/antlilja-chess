@@ -94,6 +94,22 @@ pub struct ConnectionHandler {
 }
 
 impl ConnectionHandler {
+    pub fn host(port: u8) -> Self {
+        let listener = TcpListener::bind(format!("127.0.0.1:{}", port)).unwrap();
+        let (stream, _addr) = listener.accept().unwrap();
+
+        let mut handler = Self {
+            is_host: true,
+            stream: Arc::new(Mutex::new(stream)),
+            recieved_messages: Arc::new(Mutex::new(VecDeque::with_capacity(10))),
+            read_handle: None,
+        };
+
+        handler.read_handle = Some(handler.spawn_read_thread());
+
+        handler
+    }
+
     fn spawn_read_thread(&mut self) -> thread::JoinHandle<()> {
         let stream = Arc::clone(&self.stream);
         let queue = Arc::clone(&self.recieved_messages);
