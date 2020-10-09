@@ -113,10 +113,10 @@ impl Game {
         }
     }
 
-    pub fn undo(&mut self) -> bool {
-        if let Some((board, _, _)) = self.history.last() {
-            self.board = board.clone();
-            self.history.truncate(self.history.len() - 1);
+    pub fn undo(&mut self, count: usize) -> bool {
+        if self.history.len() <= count {
+            self.board = self.history[self.history.len() - count].0;
+            self.history.truncate(self.history.len() - count);
             true
         } else {
             false
