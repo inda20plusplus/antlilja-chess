@@ -7,6 +7,7 @@ use gui::network::ConnectionHandler;
 use gui::view::{View, ViewSettings};
 use piston_window::*;
 use std::io::{self, Read};
+use std::net::IpAddr;
 
 fn get_input() -> String {
     let mut input = String::new();
@@ -22,8 +23,8 @@ fn main() {
     println!("Enter if game is Local or Remote\nFormat: local | host | remote");
     let connection = match &get_input()[..] {
         "local" => None,
-        "host" => Some(ConnectionHandler { is_host: true }),
-        "remote" => Some(ConnectionHandler { is_host: false }),
+        "host" => Some(ConnectionHandler.host(24337)),
+        "remote" => Some(ConnectionHandler.connect("127.0.0.1".parse(), 24337)),
         _ => panic!("Invalid input"),
     };
 
