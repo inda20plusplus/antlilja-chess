@@ -185,6 +185,10 @@ impl ConnectionHandler {
         let stream_mutex = Arc::clone(&self.stream);
         let mut stream = stream_mutex.lock().unwrap();
 
-        stream.write_all(&message.to_bytes())
+        let result = stream.write_all(&message.to_bytes());
+
+        self.last_sent = Some(message);
+
+        result
     }
 }
