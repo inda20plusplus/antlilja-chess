@@ -162,6 +162,8 @@ pub struct ConnectionHandler {
 
 impl ConnectionHandler {
     pub fn new(stream: TcpStream, is_host: bool) -> Self {
+        stream.set_read_timeout(Some(std::time::Duration::from_millis(10))).unwrap();
+
         let mut handler = Self {
             is_host,
             stream: Arc::new(Mutex::new(stream)),
@@ -198,13 +200,23 @@ impl ConnectionHandler {
             let mut stream = stream.lock().unwrap();
             let mut queue = queue.lock().unwrap();
 
-            let result = stream.read(&mut buf).unwrap();
-
-            if result == 0 {
-                break;
-            };
-
-            queue.push_front(buf);
+            match stream.read(&mut buf) {
+                Ok(result) => {
+                    if result == 0 {
+                        break;
+                    } else {
+                        queue.push_front(buf);
+                    }
+                }
+                Err(e) => {
+                    match e.kind() {
+                        std::io::ErrorKind::WouldBlock => (),
+                        _ => {
+                            panic!("Recieved error when reading stream buffer: {:?}", e);
+                        }
+                    }
+                }
+            }
 
             drop(stream);
             drop(queue);
