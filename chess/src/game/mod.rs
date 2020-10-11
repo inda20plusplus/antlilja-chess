@@ -19,7 +19,7 @@ pub struct Game {
     move_map: MoveMap,
     history: Vec<(Board, Pos, Move)>,
     player: Color,
-    king_pos: Pos,
+    pub king_pos: Pos,
 }
 
 impl Default for Game {
