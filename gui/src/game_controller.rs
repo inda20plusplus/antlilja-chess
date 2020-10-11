@@ -241,6 +241,7 @@ impl GameController {
                 GameResult::Stalemate => self.state = State::End(Ending::Tie),
                 GameResult::InvalidMove => {
                     panic!("Move was in current move but game returned InvalidMove")
+                }
             }
 
             if self.connection_handler.is_some() {
