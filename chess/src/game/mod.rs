@@ -17,7 +17,7 @@ pub enum GameResult {
 pub struct Game {
     board: Board,
     move_map: MoveMap,
-    last_move: (Pos, Move),
+    history: Vec<(Board, Pos, Move)>,
     player: Color,
     pub king_pos: Pos,
 }
@@ -27,7 +27,7 @@ impl Default for Game {
         let mut game = Game {
             board: Default::default(),
             move_map: MoveMap::new(),
-            last_move: (Pos::invalid(), Move::None),
+            history: Vec::new(),
             player: Color::White,
             king_pos: Pos::new_xy(4, 0),
         };
@@ -43,7 +43,7 @@ impl Game {
         let mut game = Self {
             board,
             move_map: MoveMap::new(),
-            last_move: (Pos::invalid(), Move::None),
+            history: Vec::new(),
             player,
             king_pos: board.find_king(player),
         };
@@ -99,7 +99,7 @@ impl Game {
             return GameResult::InvalidMove;
         }
 
-        self.last_move = (from, r#move);
+        self.history.push((self.board, from, r#move));
         self.board = self.board.after_move(from, r#move, self.player);
 
         if self.switch_side() {
@@ -110,6 +110,16 @@ impl Game {
             }
         } else {
             GameResult::Ok
+        }
+    }
+
+    pub fn undo(&mut self, count: usize) -> bool {
+        if self.history.len() <= count {
+            self.board = self.history[self.history.len() - count].0;
+            self.history.truncate(self.history.len() - count);
+            true
+        } else {
+            false
         }
     }
 

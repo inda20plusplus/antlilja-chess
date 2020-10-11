@@ -32,9 +32,9 @@ impl PieceMoves {
 
     pub fn new(stack_index: u8, board_index: u8) -> Self {
         PieceMoves {
-            stack_index: stack_index,
+            stack_index,
             len: 0,
-            board_index: board_index,
+            board_index,
         }
     }
 
