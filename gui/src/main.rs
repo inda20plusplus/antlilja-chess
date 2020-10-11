@@ -37,6 +37,10 @@ fn main() {
     let mut view = View::new(view_settings, textures);
 
     while let Some(event) = window.next() {
+        if controller.connection_handler.is_some() {
+            controller.handle_network_events()
+        }
+
         controller.event(&event);
 
         window.draw_2d(&event, |context, graphics, _| {

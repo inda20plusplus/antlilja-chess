@@ -1,9 +1,10 @@
-use crate::network::ConnectionHandler;
+use crate::network::{ConnectionHandler, Message};
 use crate::view::ViewSettings;
 use chess::game::{Game, GameResult};
 use chess::{Color, Move, PieceType, Pos};
 use piston_window::{Button, GenericEvent, MouseButton};
 use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
 #[derive(PartialEq)]
 pub enum Ending {
@@ -32,7 +33,7 @@ pub enum State {
 pub struct GameController {
     pub game: Game,
     pub state: State,
-    connection_handler: Option<ConnectionHandler>,
+    pub connection_handler: Option<ConnectionHandler>,
     settings: ViewSettings,
     pub selected_square: Option<[usize; 2]>,
     pub current_moves: Option<HashMap<[usize; 2], Move>>,
@@ -68,6 +69,19 @@ impl GameController {
                     State::Promotion(_) => self.promotion_choice(),
                     _ => (),
                 }
+            }
+        }
+    }
+
+    pub fn handle_network_events(&mut self) {
+        if let Some(handler) = &mut self.connection_handler {
+            let queue_mutex = Arc::clone(&handler.recieved_messages);
+            let mut queue = queue_mutex.lock().unwrap();
+
+            while !queue.is_empty() {
+                let msg = Message::from_bytes(queue.pop_front().unwrap()).unwrap();
+
+                self.network_event(msg).unwrap();
             }
         }
     }
