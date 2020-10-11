@@ -5,6 +5,7 @@ use chess::{Color, Move, PieceType, Pos};
 use piston_window::{Button, GenericEvent, MouseButton};
 use std::collections::HashMap;
 
+#[derive(PartialEq)]
 pub enum Ending {
     White,
     Black,
@@ -21,6 +22,7 @@ impl ToString for Ending {
     }
 }
 
+#[derive(PartialEq)]
 pub enum State {
     Playing,
     Promotion(Pos),
