@@ -211,7 +211,7 @@ impl ConnectionHandler {
         })
     }
 
-    fn write_message(&mut self, message: Message) -> std::io::Result<()> {
+    pub fn write_message(&mut self, message: Message) -> std::io::Result<()> {
         let stream_mutex = Arc::clone(&self.stream);
         let mut stream = stream_mutex.lock().unwrap();
 
