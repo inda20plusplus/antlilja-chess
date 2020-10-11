@@ -209,8 +209,11 @@ impl GameController {
     }
 
     fn execute_move(&mut self, r#move: Move) {
+        let local_play = self.local_play_is_allowed();
+
         if let Some(from) = self.selected_square {
-            let turn_result = self.game.play_xy(from[0] as u8, from[1] as u8, *r#move);
+            let origin = Pos::new_xy(from[0] as u8, from[1] as u8);
+            let turn_result = self.game.play(origin, r#move);
 
             match turn_result {
                 GameResult::Ok => self.state = State::Playing,
@@ -224,6 +227,13 @@ impl GameController {
                 GameResult::Stalemate => self.state = State::End(Ending::Tie),
                 GameResult::InvalidMove => {
                     panic!("Move was in current move but game returned InvalidMove")
+            }
+
+            if self.connection_handler.is_some() {
+                if local_play {
+                    self.handle_local_result(origin, r#move, turn_result);
+                } else {
+                    self.handle_remote_result(turn_result);
                 }
             }
 
