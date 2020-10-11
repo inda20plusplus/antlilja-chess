@@ -100,7 +100,7 @@ impl GameController {
                     if let Move::PawnPromotion(_, pos) = r#move {
                         self.state = State::Promotion(Pos::new_index(pos.index() as u8));
                     } else {
-                        self.execute_move(r#move);
+                        self.execute_move(*r#move);
                     }
                 } else {
                     self.selected_square = Some([cell_x, cell_y]);
@@ -136,12 +136,12 @@ impl GameController {
                     Move::PawnPromotion(PieceType::Bishop, pos)
                 };
 
-                self.execute_move(&r#move);
+                self.execute_move(r#move);
             }
         }
     }
 
-    fn execute_move(&mut self, r#move: &Move) {
+    fn execute_move(&mut self, r#move: Move) {
         if let Some(from) = self.selected_square {
             let turn_result = self.game.play_xy(from[0] as u8, from[1] as u8, *r#move);
 
