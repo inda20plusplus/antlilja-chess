@@ -4,10 +4,6 @@ version = "0.1.0"
 authors = ["Markus Videfors <mvid@kth.se>"]
 edition = "2018"
 
-[lib]
-name = "gui"
-path = "src/lib.rs"
-
 [dependencies]
 chess = {path = "../chess"}
 piston_window = "0.113.0"
