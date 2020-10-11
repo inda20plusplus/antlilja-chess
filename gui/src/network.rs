@@ -72,6 +72,31 @@ impl MoveType {
             MoveType::QueensideCastle => (None, Move::QueenSideCastling),
         }
     }
+
+    fn from_chess_move(origin: Pos, r#move: Move) -> Result<Self, &'static str> {
+        match r#move {
+            Move::Move(target) => {
+                Ok(MoveType::Standard(origin.index_u8(), target.index_u8()))
+            }
+            Move::EnPassant(target) => {
+                Ok(MoveType::EnPassant(origin.index_u8(), target.index_u8()))
+            }
+            Move::PawnPromotion(piece_type, target) => {
+                let piece_index = match piece_type {
+                    PieceType::Knight => 0x0,
+                    PieceType::Bishop => 0x1,
+                    PieceType::Rook => 0x2,
+                    PieceType::Queen => 0x3,
+                    _ => return Err("Invalid PieceType when converting from chess::Move"),
+                };
+
+                Ok(MoveType::Promotion(origin.index_u8(), target.index_u8(), piece_index))
+            }
+            Move::KingSideCastling => Ok(MoveType::KingsideCastle),
+            Move::QueenSideCastling => Ok(MoveType::QueensideCastle),
+            Move::None => Err("Recieved Move::None, cannot convert into MoveType"),
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -119,6 +144,11 @@ impl Message {
             0x6 => Ok(Message::Resign),
             _ => Err("Byte is not valid message type"),
         }
+    }
+    
+    pub fn from_chess_move(origin: Pos, r#move: Move) -> Result<Self, &'static str> {
+        let move_type = MoveType::from_chess_move(origin, r#move);
+        Ok(Message::Move(move_type.unwrap()))
     }
 }
 
