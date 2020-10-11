@@ -155,7 +155,7 @@ impl Message {
 pub struct ConnectionHandler {
     pub is_host: bool,
     stream: Arc<Mutex<TcpStream>>,
-    recieved_messages: Arc<Mutex<VecDeque<[u8; 5]>>>,
+    pub recieved_messages: Arc<Mutex<VecDeque<[u8; 5]>>>,
     read_handle: Option<thread::JoinHandle<()>>,
     pub last_sent: Option<Message>,
 }
