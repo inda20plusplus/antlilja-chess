@@ -279,7 +279,7 @@ impl GameController {
                                 moves.insert([position[0] + 2, position[1]], *r#move);
                             }
                             Move::QueenSideCastling => {
-                                moves.insert([position[0] - 3, position[1]], *r#move);
+                                moves.insert([position[0] - 2, position[1]], *r#move);
                             }
                             _ => (),
                         }
