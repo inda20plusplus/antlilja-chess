@@ -72,6 +72,29 @@ impl GameController {
         }
     }
 
+    fn handle_local_result(&mut self, origin: Pos, r#move: Move, turn_result: GameResult) {
+        if let Some(handler) = &mut self.connection_handler {
+            if turn_result != GameResult::InvalidMove {
+                handler.write_message(Message::from_chess_move(origin, r#move).unwrap());
+            }
+        } else {
+            panic!("Couldn't fetch connection handler");
+        }
+    }
+
+    fn handle_remote_result(&mut self, turn_result: GameResult) {
+        if let Some(handler) = &mut self.connection_handler {
+            match turn_result {
+                GameResult::Ok => Ok(()),
+                GameResult::Checkmate => handler.write_message(Message::Checkmate),
+                GameResult::Stalemate => handler.write_message(Message::Draw),
+                GameResult::InvalidMove => handler.write_message(Message::Decline),
+            }.unwrap()
+        } else {
+            panic!("Couldn't fetch connection handler");
+        }
+    }
+
     fn local_play_is_allowed(&self) -> bool {
         let color = self.game.current_color();
 
