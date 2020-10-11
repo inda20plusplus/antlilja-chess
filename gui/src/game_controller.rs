@@ -72,6 +72,50 @@ impl GameController {
         }
     }
 
+    fn network_event(&mut self, message: Message) -> std::io::Result<()> {
+        let allow_play = !self.local_play_is_allowed();
+
+        if let Some(handler) = &mut self.connection_handler {
+            match message {
+                Message::Decline => {
+                    if let Some(previous) = handler.last_sent {
+                    } else {
+                        handler.write_message(Message::Decline)?;
+                    }
+                }
+                Message::Move(move_type) => {
+                    if allow_play {
+                        let (origin, r#move) = move_type.to_chess_move();
+                        let pos = match origin {
+                            Some(pos) => pos,
+                            None => self.game.king_pos,
+                        };
+
+                        self.selected_square = Some([pos.x() as usize, pos.y() as usize]);
+                        self.execute_move(r#move);
+                    } else {
+                        handler.write_message(Message::Decline)?;
+                    }
+                }
+                Message::Undo => handler.write_message(Message::Decline)?,
+                Message::Accept => (),
+                Message::Checkmate => (),
+                Message::Draw => {
+                    if self.state == State::End(Ending::Tie) {
+                        handler.write_message(Message::Accept)?;
+                    } else {
+                        handler.write_message(Message::Decline)?;
+                    }
+                }
+                Message::Resign => {}
+            }
+        } else {
+            panic!("Couldn't fetch connection handler");
+        }
+
+        Ok(())
+    }
+
     fn handle_local_result(&mut self, origin: Pos, r#move: Move, turn_result: GameResult) {
         if let Some(handler) = &mut self.connection_handler {
             if turn_result != GameResult::InvalidMove {
